@@ -435,16 +435,22 @@ var emailjs=function(e){"use strict";class t{constructor(e=0,t="Network Error"){
 .homepage-megamenu-column .product-grid::-webkit-scrollbar{height:10px;}
 .homepage-megamenu-column .product-grid::-webkit-scrollbar-track{background:var(--border);border-radius:8px;}
 .homepage-megamenu-column .product-grid::-webkit-scrollbar-thumb{background:var(--accent);border-radius:8px;}
-.homepage-megamenu-column .product-card .card-image{height:112px;align-items:center;justify-content:center;padding:0;position:relative;background-color:#f8fafc;background-position:center;background-size:cover;}
-.homepage-megamenu-column .product-card .card-image::before{content:"";position:absolute;inset:0;background:center/contain no-repeat;animation:categoryArtworkFloat 3.4s ease-in-out infinite;}
-.homepage-megamenu-column .product-card .card-image .ic{visibility:hidden;}
-.homepage-megamenu-column.category-antivirus .product-card .card-image{background-color:#ecfdf5;}
-.homepage-megamenu-column.category-antivirus .product-card .card-image::before{background-image:url("images/category-antivirus.svg");}
-.homepage-megamenu-column.category-software .product-card .card-image{background-color:#eff6ff;}
-.homepage-megamenu-column.category-software .product-card .card-image::before{background-image:url("images/category-software.svg");animation-delay:.2s;}
-.homepage-megamenu-column.category-pc-build .product-card .card-image{background-color:#f5f3ff;}
-.homepage-megamenu-column.category-pc-build .product-card .card-image::before{background-image:url("images/category-pc-build.svg");animation-delay:.4s;}
-@keyframes categoryArtworkFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-3px) scale(1.025)}}
+.homepage-megamenu-column .product-card .card-image{height:112px;align-items:center;justify-content:center;padding:8px;position:relative;background:linear-gradient(145deg,#f8fafc,#eef2f7);}
+.homepage-megamenu-column.category-antivirus .product-card .card-image{background:linear-gradient(145deg,#ecfdf5,#d1fae5);}
+.homepage-megamenu-column.category-software .product-card .card-image{background:linear-gradient(145deg,#eff6ff,#dbeafe);}
+.homepage-megamenu-column.category-pc-build .product-card .card-image{background:linear-gradient(145deg,#f5f3ff,#ede9fe);}
+.product-logo{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:100%;height:100%;color:var(--logo-color,#334155);animation:productLogoFloat 3.4s ease-in-out infinite;}
+.product-logo-mark{width:42px;height:42px;flex:0 0 42px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:var(--logo-color,#334155);color:#fff;font-size:15px;font-weight:800;letter-spacing:-.6px;box-shadow:0 5px 12px color-mix(in srgb,var(--logo-color,#334155) 25%,transparent);}
+.product-logo-mark svg{width:34px;height:34px;display:block;}
+.product-image-fallback{position:absolute;inset:0;padding:8px;}
+.product-image-fallback[hidden]{display:none!important;}
+.product-logo-copy{display:flex;flex-direction:column;align-items:center;width:100%;min-width:0;}
+.product-logo-name{font-size:12px;line-height:1.05;font-weight:800;letter-spacing:-.2px;text-align:center;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;min-height:25px;}
+.product-logo-detail{margin-top:2px;max-width:100%;font-size:9px;line-height:1.15;font-weight:700;letter-spacing:.45px;text-transform:uppercase;opacity:.72;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.category-software .product-logo-windows .product-logo-mark{background:#fff;box-shadow:none;}
+.product-logo-windows .product-logo-mark svg{width:34px;height:34px;}
+.product-card:hover .product-logo{animation-duration:1.5s;}
+@keyframes productLogoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 /* chota icon / image */
 .product-card .card-image{aspect-ratio:auto;height:64px;font-size:22px;margin-bottom:8px;align-items:flex-end;justify-content:center;padding-bottom:8px;box-sizing:border-box;}
 .product-card .badge-oos{top:5px;left:5px;font-size:8px;padding:2px 6px;}
@@ -6264,6 +6270,61 @@ function renderHome() {
   renderProductsMenu();
 }
 
+function getProductLogoMarkup(p, category) {
+  const text = [p.name, p.brand, p.subcategory, p.specs].filter(Boolean).join(' ');
+  const brandFromSpecs = (/\bBrand:\s*([^|]+)/i.exec(p.specs || '') || [])[1];
+  const logos = [
+    {key:'quickheal', pattern:/quick\s*heal/i, name:'Quick Heal', color:'#16804a', mark:'QH'},
+    {key:'npav', pattern:/\bnpav\b|net protector/i, name:'NPAV', color:'#c62828', mark:'N'},
+    {key:'windows', pattern:/\bwindows\b|\bmicrosoft\b/i, name:'Windows', color:'#0078d4', mark:'W'},
+    {key:'intel', pattern:/\bintel\b/i, name:'Intel', color:'#0878b9', mark:'intel'},
+    {key:'amd', pattern:/\bamd\b|radeon/i, name:'AMD', color:'#222222', mark:'AMD'},
+    {key:'nvidia', pattern:/\bnvidia\b|geforce|quadro/i, name:'NVIDIA', color:'#76b900', mark:'N'},
+    {key:'kingston', pattern:/\bkingston\b/i, name:'Kingston', color:'#e31837', mark:'K'},
+    {key:'patriot', pattern:/\bpatriot\b/i, name:'Patriot', color:'#1f2937', mark:'P'},
+    {key:'adata', pattern:/\badata\b|\bxpg\b/i, name:'ADATA', color:'#dc2626', mark:'A'},
+    {key:'corsair', pattern:/\bcorsair\b/i, name:'Corsair', color:'#111827', mark:'C'},
+    {key:'samsung', pattern:/\bsamsung\b/i, name:'Samsung', color:'#1428a0', mark:'S'},
+    {key:'gigabyte', pattern:/\bgigabyte\b/i, name:'GIGABYTE', color:'#1976d2', mark:'G'},
+    {key:'asus', pattern:/\basus\b/i, name:'ASUS', color:'#111827', mark:'ASUS'},
+    {key:'msi', pattern:/\bmsi\b/i, name:'MSI', color:'#d71920', mark:'MSI'},
+    {key:'western-digital', pattern:/western digital|\bwd\b/i, name:'WD', color:'#0868ac', mark:'WD'},
+    {key:'seagate', pattern:/\bseagate\b/i, name:'Seagate', color:'#0873ba', mark:'S'},
+    {key:'sabrent', pattern:/\bsabrent\b/i, name:'Sabrent', color:'#d97706', mark:'S'},
+    {key:'sandisk', pattern:/\bsandisk\b/i, name:'SanDisk', color:'#df1b12', mark:'SD'},
+    {key:'crucial', pattern:/\bcrucial\b/i, name:'Crucial', color:'#e21b2d', mark:'C'},
+    {key:'lexar', pattern:/\blexar\b/i, name:'Lexar', color:'#111827', mark:'L'},
+    {key:'logitech', pattern:/\blogitech\b/i, name:'Logitech', color:'#0874c9', mark:'G'},
+    {key:'acer', pattern:/\bacer\b/i, name:'Acer', color:'#83b81a', mark:'acer'},
+    {key:'lenovo', pattern:/\blenovo\b/i, name:'Lenovo', color:'#e2231a', mark:'L'},
+    {key:'zotac', pattern:/\bzotac\b/i, name:'ZOTAC', color:'#f2a900', mark:'Z'},
+    {key:'cooler-master', pattern:/cooler master/i, name:'Cooler Master', color:'#222222', mark:'CM'},
+    {key:'deepcool', pattern:/\bdeepcool\b/i, name:'DEEPCOOL', color:'#1684c7', mark:'D'},
+    {key:'thermaltake', pattern:/thermaltake/i, name:'Thermaltake', color:'#e32636', mark:'T'},
+    {key:'antec', pattern:/\bantec\b/i, name:'ANTEC', color:'#ea580c', mark:'A'},
+    {key:'nzxt', pattern:/\bnzxt\b/i, name:'NZXT', color:'#555555', mark:'NZXT'},
+    {key:'evga', pattern:/\bevga\b/i, name:'EVGA', color:'#111827', mark:'EVGA'},
+    {key:'gskill', pattern:/g\.?\s*skill/i, name:'G.SKILL', color:'#111827', mark:'G'}
+  ];
+  const logo = logos.find(item => item.pattern.test(text));
+  const rawBrand = p.brand || brandFromSpecs;
+  const brand = logo ? logo.name : (rawBrand ? String(rawBrand).trim() : (p.subcategory || category));
+  const mark = logo ? logo.mark : brand.split(/[\s®™-]+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+  const detail = category === 'Software' && logo && logo.key === 'windows'
+    ? String(p.name || 'Windows').replace(/.*?\bwindows\b\s*/i, '').trim() || 'Operating System'
+    : category === 'Antivirus' && logo
+      ? String(p.name || '').replace(logo.pattern, '').trim() || 'Security'
+      : (p.subcategory || p.name || category);
+  const safeBrand = imgAttr(brand.slice(0, 32));
+  const safeDetail = imgAttr(detail.slice(0, 42));
+  const symbol = logo && logo.key === 'windows'
+    ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#f25022" d="M2 4.5 14 2.8v12H2z"/><path fill="#7fba00" d="M16 2.5 30 0v14.8H16z"/><path fill="#00a4ef" d="M2 16.8h12v12L2 27z"/><path fill="#ffb900" d="M16 16.8h14V32l-14-2.5z"/></svg>'
+    : logo && logo.key === 'quickheal'
+      ? '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.5c-4 2.8-7.5 3.5-11 3.8v9.5c0 7.1 4.7 11.4 11 14.1 6.3-2.7 11-7 11-14.1V6.3c-3.5-.3-7-1-11-3.8Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="m10.5 16 3.7 3.7 7.6-8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      : imgAttr(mark.slice(0, 5));
+  return `<div class="product-logo product-logo-${logo ? logo.key : 'generic'}" style="--logo-color:${logo ? logo.color : '#334155'}"><span class="product-logo-mark">${symbol}</span><span class="product-logo-copy"><span class="product-logo-name">${safeBrand}</span><span class="product-logo-detail">${safeDetail}</span></span></div>`;
+}
+
 function renderProductCard(p, category, wishlist) {
   const getCategoryIcon = (cat) => {
     if(cat === 'Antivirus') return '🛡️';
@@ -6275,11 +6336,12 @@ function renderProductCard(p, category, wishlist) {
   const outOfStock = p.stock === 0;
   const hasPrice = p.price > 0;
   const isKeyManaged = Array.isArray(p.licenseKeys);
+  const productImage = getProductImage(p);
   return `
     <div class="product-card" onclick="showProductDetail(${p.id})">
       <div class="card-image">
         ${outOfStock ? '<span class="badge-oos">Out of Stock</span>' : ''}
-        ${getProductImage(p) ? `<img class="p-img" src="${imgAttr(getProductImage(p))}" alt="${imgAttr(p.name)}" loading="lazy" onerror="this.replaceWith(document.createTextNode('${getCategoryIcon(category)}'))">` : getCategoryIcon(category)}
+        ${productImage ? `<img class="p-img" src="${imgAttr(productImage)}" alt="${imgAttr(p.name)}" loading="lazy" onerror="this.onerror=null;this.hidden=true;this.nextElementSibling.hidden=false"><div class="product-image-fallback" hidden>${getProductLogoMarkup(p, category)}</div>` : getProductLogoMarkup(p, category)}
       </div>
       <div class="name">${p.name}</div>
       ${isKeyManaged ? '<div class="sub-tag">🔑 Instant license key delivery</div>' : ''}
