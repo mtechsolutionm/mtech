@@ -387,6 +387,15 @@ var emailjs=function(e){"use strict";class t{constructor(e=0,t="Network Error"){
 :root{--accent:#0B8A8A;--accent-dim:#E0F4F2;--accent-text:#075F5F;--radius:12px;--shadow:0 1px 2px rgba(15,23,42,.06),0 6px 20px rgba(15,23,42,.06);}
 .ic{display:inline-block;width:1.1em;height:1.1em;vertical-align:-0.17em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .ic.fill{fill:currentColor;}
+.site-header p .ic{width:1.15em;height:1.15em;animation:categoryLogoFloat 2.8s ease-in-out infinite;}
+.site-header p .ic:nth-of-type(2){animation-delay:.2s;}
+.site-header p .ic:nth-of-type(3){animation-delay:.4s;}
+#homePage .homepage-megamenu-column:nth-child(1) .card-image .ic{color:#0b8a8a;animation:categoryLogoPulse 2.8s ease-in-out infinite;}
+#homePage .homepage-megamenu-column:nth-child(2) .card-image .ic{color:#2563eb;animation:categoryLogoFloat 3s ease-in-out infinite;}
+#homePage .homepage-megamenu-column:nth-child(3) .card-image .ic{color:#7c3aed;animation:categoryLogoPulse 3.2s ease-in-out infinite;}
+#homePage .homepage-megamenu-column .product-card:hover .card-image .ic{animation-duration:1.2s;}
+@keyframes categoryLogoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes categoryLogoPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 currentColor)}50%{transform:scale(1.1);filter:drop-shadow(0 2px 4px currentColor)}}
 :focus-visible{outline:3px solid rgba(11,138,138,.45);outline-offset:2px;}
 .topbar{padding:12px 20px;backdrop-filter:saturate(1.4) blur(10px);background:rgba(255,255,255,.92);}
 .brand{font-family:'Space Grotesk',sans-serif;font-size:20px;letter-spacing:-.2px;color:var(--accent-text);}
