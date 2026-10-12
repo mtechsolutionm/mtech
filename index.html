@@ -435,6 +435,16 @@ var emailjs=function(e){"use strict";class t{constructor(e=0,t="Network Error"){
 .homepage-megamenu-column .product-grid::-webkit-scrollbar{height:10px;}
 .homepage-megamenu-column .product-grid::-webkit-scrollbar-track{background:var(--border);border-radius:8px;}
 .homepage-megamenu-column .product-grid::-webkit-scrollbar-thumb{background:var(--accent);border-radius:8px;}
+.homepage-megamenu-column .product-card .card-image{height:112px;align-items:center;justify-content:center;padding:0;position:relative;background-color:#f8fafc;background-position:center;background-size:cover;}
+.homepage-megamenu-column .product-card .card-image::before{content:"";position:absolute;inset:0;background:center/contain no-repeat;animation:categoryArtworkFloat 3.4s ease-in-out infinite;}
+.homepage-megamenu-column .product-card .card-image .ic{visibility:hidden;}
+.homepage-megamenu-column.category-antivirus .product-card .card-image{background-color:#ecfdf5;}
+.homepage-megamenu-column.category-antivirus .product-card .card-image::before{background-image:url("images/category-antivirus.svg");}
+.homepage-megamenu-column.category-software .product-card .card-image{background-color:#eff6ff;}
+.homepage-megamenu-column.category-software .product-card .card-image::before{background-image:url("images/category-software.svg");animation-delay:.2s;}
+.homepage-megamenu-column.category-pc-build .product-card .card-image{background-color:#f5f3ff;}
+.homepage-megamenu-column.category-pc-build .product-card .card-image::before{background-image:url("images/category-pc-build.svg");animation-delay:.4s;}
+@keyframes categoryArtworkFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-3px) scale(1.025)}}
 /* chota icon / image */
 .product-card .card-image{aspect-ratio:auto;height:64px;font-size:22px;margin-bottom:8px;align-items:flex-end;justify-content:center;padding-bottom:8px;box-sizing:border-box;}
 .product-card .badge-oos{top:5px;left:5px;font-size:8px;padding:2px 6px;}
@@ -6221,7 +6231,8 @@ function renderHome() {
     const catProducts = products.filter(p => p.category === category);
     const subcategories = (CATEGORY_STRUCTURE[category] || []).filter(sub => catProducts.some(p => p.subcategory === sub));
     
-    let columnHtml = `<div class="homepage-megamenu-column">`;
+    const categoryClass = category === 'Antivirus' ? 'category-antivirus' : category === 'Software' ? 'category-software' : category === 'PC Build' ? 'category-pc-build' : '';
+    let columnHtml = `<div class="homepage-megamenu-column ${categoryClass}">`;
     columnHtml += `<div class="product-menu-category">${getCategoryIcon(category)} ${category}</div>`;
     if(category === 'PC Build') {
       columnHtml += `<div style="text-align:center;padding:6px 0 18px;"><button class="btn-checkout" style="max-width:280px;background:var(--success);" onclick="startPCBuilder()">🛠️ Build Your Own PC →</button></div>`;
