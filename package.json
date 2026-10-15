@@ -1,0 +1,12 @@
+{
+  "name": "mtech-store",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mtech storefront with local dealer OTP authentication",
+  "engines": {
+    "node": ">=20.6.0"
+  },
+  "scripts": {
+    "start": "node --env-file=.env server.js"
+  }
+}
