@@ -1,4 +1,5 @@
 <html lang="en"><head>
+<script>if(new URLSearchParams(location.search).has('admin-standalone'))document.documentElement.classList.add('admin-standalone');</script>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -37,6 +38,7 @@ var emailjs=function(e){"use strict";class t{constructor(e=0,t="Network Error"){
     rawSet.call(this,k,v);
     if(this===localStorage && A.adminToken){
       if(k==='products'){ clearTimeout(t); t=setTimeout(function(){push('products',v);},500); }
+      else if(k==='mtechCategoryStructure'){ push('categories',v); }
       else if(k==='mtechDealersAdded'){ push('dealers',v); }
     }
   };
@@ -215,7 +217,7 @@ var emailjs=function(e){"use strict";class t{constructor(e=0,t="Network Error"){
   .form-group input,.form-group select{width:100%;padding:12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;}
   .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
   .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-  .payment-methods{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+  .payment-methods{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;}
   .payment-option{padding:12px;border:2px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;font-weight:600;transition:.2s;}
   .payment-option.active{border-color:var(--accent);background:var(--accent-dim);}
 
@@ -467,6 +469,12 @@ var emailjs=function(e){"use strict";class t{constructor(e=0,t="Network Error"){
 #cartPage .container,#checkoutPage .container,#ordersPage .container{max-width:1000px;}
 #pcBuilderPage .container{max-width:1500px;}
 html,body{overflow-x:hidden;}
+html.admin-standalone,html.admin-standalone body{min-height:100%;overflow-x:hidden;}
+html.admin-standalone #app{max-width:none;min-height:100vh;padding:0;}
+html.admin-standalone #app>:not(#adminPage){display:none!important;}
+html.admin-standalone #adminPage{display:none!important;min-height:100vh;animation:none;}
+html.admin-standalone.admin-authenticated #adminPage{display:block!important;}
+html.admin-standalone .offline-banner{display:none!important;}
 </style>
 </head>
 <body>
@@ -4718,7 +4726,9 @@ html,body{overflow-x:hidden;}
         <div class="payment-methods">
           <div class="payment-option active" data-method="cod" onclick="setPaymentMethod(this)">💰 Cash on Delivery</div>
           <div class="payment-option" data-method="bank" onclick="setPaymentMethod(this)">🏦 Bank Transfer</div>
+          <div class="payment-option" data-method="razorpay" onclick="setPaymentMethod(this)">🔒 UPI, Cards &amp; Net Banking</div>
         </div>
+        <p style="margin-top:-6px;color:var(--muted);font-size:0.85em;">Online payments are securely processed by Razorpay.</p>
 
         <h3 style="margin-top:24px;">Order Summary</h3>
         <div id="checkoutSummary"></div>
@@ -4744,7 +4754,8 @@ html,body{overflow-x:hidden;}
       <div class="admin-header">
         <button class="admin-btn" onclick="switchAdminTab('products', this)">Products</button>
         <button class="admin-btn" onclick="switchAdminTab('categories', this)">Categories</button>
-        <button class="admin-btn active" onclick="switchAdminTab('subcategories', this)">Sub Categories</button>
+        <button class="admin-btn active" id="adminDashboardButton" onclick="switchAdminTab('inventory', this)">Dashboard</button>
+        <button class="admin-btn" onclick="switchAdminTab('subcategories', this)">Sub Categories</button>
         <button class="admin-btn" onclick="switchAdminTab('orders', this)">Orders</button>
         <button class="admin-btn" onclick="switchAdminTab('inventory', this)">Inventory</button>
         <button class="admin-btn" onclick="switchAdminTab('bulk', this)">Bulk Import/Export</button>
@@ -5167,8 +5178,15 @@ Corsair Vengeance 32GB DDR5 6000MHz"></textarea>
       </div>
 
       <div id="inventoryTab" class="admin-tab" style="display:none;">
-        <h3>Stock Levels by Category</h3>
-        <div id="inventoryStats"><div class="stat-card" style="background:var(--surface);padding:16px;margin-bottom:10px;border-radius:8px;border:1px solid var(--border);"><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:600;">Antivirus</span><span style="font-size:20px;font-weight:700;color:var(--accent-text);">90</span></div><div style="font-size:12px;color:var(--muted);margin-top:4px;">5 products</div></div><div class="stat-card" style="background:var(--surface);padding:16px;margin-bottom:10px;border-radius:8px;border:1px solid var(--border);"><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:600;">Software</span><span style="font-size:20px;font-weight:700;color:var(--accent-text);">71</span></div><div style="font-size:12px;color:var(--muted);margin-top:4px;">7 products</div></div><div class="stat-card" style="background:var(--surface);padding:16px;margin-bottom:10px;border-radius:8px;border:1px solid var(--border);"><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:600;">PC Build</span><span style="font-size:20px;font-weight:700;color:var(--accent-text);">3460</span></div><div style="font-size:12px;color:var(--muted);margin-top:4px;">2809 products</div></div></div>
+        <h3 style="margin-top:0;">Product Stock &amp; Pending Orders</h3>
+        <p style="color:var(--muted);margin-top:-6px;">Pending quantities are reserved from the stock shown. Stock is deducted when an order is marked completed.</p>
+        <div id="inventoryStats"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;">
+          <input id="inventorySearch" type="search" placeholder="Search product name or ID..." oninput="inventoryPage=1;renderInventoryStats();" style="flex:1;min-width:180px;padding:9px;border:1px solid var(--border);border-radius:8px;">
+          <select id="inventoryCategory" onchange="inventoryPage=1;renderInventoryStats();" style="padding:9px;border:1px solid var(--border);border-radius:8px;"><option value="All">All Categories</option></select>
+        </div>
+        <div id="inventoryProducts"></div>
+        <div id="inventoryPager" style="display:flex;justify-content:center;align-items:center;gap:12px;margin-top:14px;"></div>
       </div>
     </div>
   </div>
@@ -5458,6 +5476,7 @@ if(xr(e,"index.xml"))throw new Error("Unsupported NUMBERS 09 file");throw new Er
 <script>
 // ==================== CONSTANTS ====================
 const DATA_VERSION = '2.0';
+const CATEGORY_STORAGE_KEY = 'mtechCategoryStructure';
 const CATEGORIES = ['Antivirus', 'Software', 'PC Build'];
 
 const CATEGORY_STRUCTURE = {
@@ -8303,14 +8322,94 @@ let ADMIN_OK = false;
 
 // ==================== INITIALIZATION ====================
 async function init() {
-  
-
+  loadCategoryStructure();
   initDB();
+  syncCategoryStructureWithProducts();
   loadCart();
   renderHome();
   updateOnlineStatus();
   window.addEventListener('online', updateOnlineStatus);
   window.addEventListener('offline', updateOnlineStatus);
+}
+
+function loadCategoryStructure() {
+  const saved = localStorage.getItem(CATEGORY_STORAGE_KEY);
+  if (!saved) return;
+  try {
+    const data = JSON.parse(saved);
+    if (!Array.isArray(data.categories) || !data.structure || typeof data.structure !== 'object' || Array.isArray(data.structure)) {
+      throw new Error('Saved categories have an invalid format.');
+    }
+    CATEGORIES.splice(0, CATEGORIES.length, ...new Set(data.categories.filter(category => typeof category === 'string' && category.trim())));
+    Object.keys(CATEGORY_STRUCTURE).forEach(category => delete CATEGORY_STRUCTURE[category]);
+    CATEGORIES.forEach(category => {
+      const subcategories = data.structure[category];
+      CATEGORY_STRUCTURE[category] = Array.isArray(subcategories)
+        ? [...new Set(subcategories.filter(subcategory => typeof subcategory === 'string' && subcategory.trim()))]
+        : [];
+    });
+  } catch (error) {
+    console.error('Could not load saved categories:', error);
+  }
+}
+
+function normalizeCatalogSubcategory(category, subcategory) {
+  const name = typeof subcategory === 'string' ? subcategory.trim() : '';
+  if (category !== 'PC Build') return name;
+  const key = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const aliases = {
+    cpu: 'CPU',
+    motherboard: 'Motherboard',
+    ram: 'RAM',
+    graphicscard: 'Graphics Card',
+    graphicscards: 'Graphics Card',
+    gpu: 'Graphics Card',
+    cooler: 'Cooler',
+    cooling: 'Cooler',
+    coolingsolutions: 'Cooler',
+    ssdm2: 'SSD M2',
+    m2ssd: 'SSD M2',
+    ssdsata: 'SSD SATA',
+    satassd: 'SSD SATA',
+    hdd: 'HDD',
+    hddharddrives: 'HDD',
+    harddrive: 'HDD',
+    harddrives: 'HDD',
+    smps: 'SMPS',
+    smpspowersupplies: 'SMPS',
+    powersupply: 'SMPS',
+    powersupplies: 'SMPS',
+    cabinet: 'Cabinet',
+    case: 'Cabinet',
+    homeofficeprebuildpcs: 'Home & Office Pre Build PCs',
+    gamingpcs: 'Gaming PCs'
+  };
+  return aliases[key] || name;
+}
+
+function syncCategoryStructureWithProducts() {
+  Object.keys(CATEGORY_STRUCTURE).forEach(category => {
+    CATEGORY_STRUCTURE[category] = [...new Set((CATEGORY_STRUCTURE[category] || [])
+      .map(subcategory => normalizeCatalogSubcategory(category, subcategory))
+      .filter(Boolean))];
+  });
+  products.forEach(product => {
+    const category = typeof product.category === 'string' ? product.category.trim() : '';
+    const subcategory = normalizeCatalogSubcategory(category, product.subcategory);
+    if (!category) return;
+    product.category = category;
+    product.subcategory = subcategory;
+    if (!CATEGORIES.includes(category)) CATEGORIES.push(category);
+    if (!Array.isArray(CATEGORY_STRUCTURE[category])) CATEGORY_STRUCTURE[category] = [];
+    if (subcategory && !CATEGORY_STRUCTURE[category].includes(subcategory)) CATEGORY_STRUCTURE[category].push(subcategory);
+  });
+}
+
+function saveCategoryStructure() {
+  localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify({
+    categories: CATEGORIES,
+    structure: CATEGORY_STRUCTURE
+  }));
 }
 
 // Safe auto-increment ID: ignores invalid/NaN ids so numbering never breaks
@@ -8490,6 +8589,7 @@ function unlockAdmin() {
 }
 
 function closeAdminAuth() {
+  if(document.documentElement.classList.contains('admin-standalone') && !ADMIN_OK) return;
   document.getElementById('adminAuthModal').classList.remove('active');
 }
 
@@ -8519,6 +8619,9 @@ async function submitAdminLogin() {
     const data=await response.json().catch(()=>({}));
     if(!response.ok||!data.success) throw new Error(data.error||'Admin sign in failed.');
     sessionStorage.setItem('mtechAdminToken',data.token);
+    MTECH_API.adminToken=data.token;
+    await mtechRefreshProducts();
+    saveCategoryStructure();
   } catch(error) {
     errorMessage.textContent = error.message || 'Cannot connect to the local server.';
     passwordInput.focus();
@@ -8529,6 +8632,7 @@ async function submitAdminLogin() {
 
   window.adminOrders = [];
   ADMIN_OK = true;
+  document.documentElement.classList.add('admin-authenticated');
   const adminBtn = document.getElementById('adminBtn');
   adminBtn.textContent = 'Admin';
   adminBtn.onclick = () => goPage('admin');
@@ -8540,6 +8644,7 @@ async function submitAdminLogin() {
 
 function adminLogout() {
   ADMIN_OK = false;
+  document.documentElement.classList.remove('admin-authenticated');
   sessionStorage.removeItem('mtechAdminToken');
   MTECH_API.adminToken = null;
   window.adminOrders = [];
@@ -8549,6 +8654,7 @@ function adminLogout() {
   document.getElementById('adminLogoutBtn').style.display = 'none';
   goPage('home');
   showToast('Admin signed out', 'success');
+  if(document.documentElement.classList.contains('admin-standalone')) unlockAdmin();
 }
 
 // ==================== HOME PAGE ====================
@@ -8734,7 +8840,7 @@ function renderProductCard(p, category, wishlist) {
   return `
     <div class="product-card" onclick="showProductDetail(${p.id})">
       <div class="card-image">
-        ${outOfStock ? '<span class="badge-oos">Out of Stock</span>' : ''}
+        ${outOfStock && !isPCBuild ? '<span class="badge-oos">Out of Stock</span>' : ''}
         ${productImage ? `<img class="p-img" src="${imgAttr(productImage)}" alt="${imgAttr(p.name)}" loading="lazy" onerror="this.onerror=null;this.hidden=true;this.nextElementSibling.hidden=false"><div class="product-image-fallback" hidden>${getProductLogoMarkup(p, category)}</div>` : getProductLogoMarkup(p, category)}
       </div>
       <div class="name">${p.name}</div>
@@ -8742,7 +8848,7 @@ function renderProductCard(p, category, wishlist) {
       ${!isSoftware && !isPCBuild ? `<div class="price-row">
         ${hasPrice ? `<span class="price">${hasPlans(p) ? 'From ' : ''}₹${p.price.toLocaleString()}</span>` : `<span class="price on-request">Price on Request</span>`}
       </div>` : ''}
-      <div class="stock-text">${outOfStock ? 'Out of stock' : 'Stock: ' + p.stock}</div>
+      ${!isPCBuild ? `<div class="stock-text">${outOfStock ? 'Out of stock' : 'Stock: ' + p.stock}</div>` : ''}
       ${isSoftware ? (p.downloadLink ? `<div onclick="event.stopPropagation();">${downloadBtnHtml(p, 'margin-bottom:8px;')}</div>` : '<div class="stock-text">Download link not available</div>') : ''}
       ${!isSoftware && !isPCBuild ? `<button class="btn-add-outline" onclick="event.stopPropagation(); addToCart(${p.id});" ${(!hasPrice || outOfStock) ? 'disabled' : ''}>
         🛒 ${hasPrice ? 'Add to Cart' : 'On Request'}
@@ -9544,10 +9650,10 @@ function showProductDetail(productId) {
             <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">PRICE</div>
             <div id="pdPrice" style="font-size:24px;font-weight:700;color:var(--accent-text);">₹${product.price.toLocaleString()}</div>
           </div>` : ''}
-          <div style="background:var(--surface-2);padding:16px;border-radius:8px;text-align:center;">
+          ${product.category !== 'PC Build' ? `<div style="background:var(--surface-2);padding:16px;border-radius:8px;text-align:center;">
             <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">STOCK</div>
             <div id="pdStock" style="font-size:24px;font-weight:700;color:${product.stock > 0 ? 'var(--success)' : 'var(--danger)'};">${product.stock > 0 ? product.stock + ' Available' : 'Out of Stock'}</div>
-          </div>
+          </div>` : ''}
         </div>
 
         <div style="background:var(--accent-dim);padding:16px;border-radius:8px;margin-bottom:20px;">
@@ -10076,7 +10182,11 @@ function goPage(page) {
   if(page === 'home') renderHome();
   if(page === 'cart') renderCart();
   if(page === 'orders') { renderOrders(); loadMyOrders().then(renderOrders); }
-  if(page === 'admin') { renderAdmin(); mtechRefreshAdminOrders(); }
+  if(page === 'admin') {
+    renderAdmin();
+    switchAdminTab('inventory', document.getElementById('adminDashboardButton'));
+    mtechRefreshAdminOrders();
+  }
   if(page === 'checkout') renderCheckout();
   if(page === 'pcBuilder') renderPCBuilder();
 
@@ -10099,8 +10209,10 @@ function renderCheckout() {
     </div>`;
   });
 
-  summary += `<div style="border-top:1px solid var(--border);margin-top:8px;padding-top:8px;font-weight:700;">
-    Total: ₹${total.toLocaleString()}
+  summary += `<div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);margin-top:8px;padding-top:8px;">
+    <span>Delivery fee</span><span>₹99</span>
+  </div><div style="display:flex;justify-content:space-between;margin-top:6px;font-weight:700;">
+    <span>Total</span><span>₹${total.toLocaleString()}</span>
   </div></div>`;
 
   document.getElementById('checkoutSummary').innerHTML = summary;
@@ -10110,6 +10222,33 @@ function setPaymentMethod(el) {
   document.querySelectorAll('.payment-option').forEach(e => e.classList.remove('active'));
   el.classList.add('active');
   selectedPaymentMethod = el.dataset.method;
+}
+
+let mtechRazorpayScriptPromise;
+
+function loadRazorpayCheckout() {
+  if(window.Razorpay) return Promise.resolve();
+  if(!mtechRazorpayScriptPromise) {
+    mtechRazorpayScriptPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      const timeout = setTimeout(() => reject(new Error('Razorpay checkout could not be loaded. Please try again.')), 15000);
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => {
+        clearTimeout(timeout);
+        if(window.Razorpay) resolve();
+        else reject(new Error('Razorpay checkout could not be loaded. Please try again.'));
+      };
+      script.onerror = () => {
+        clearTimeout(timeout);
+        reject(new Error('Razorpay checkout could not be loaded. Please check your connection.'));
+      };
+      document.head.appendChild(script);
+    });
+  }
+  return mtechRazorpayScriptPromise.catch(error => {
+    mtechRazorpayScriptPromise = null;
+    throw error;
+  });
 }
 
 async function placeOrder() {
@@ -10129,11 +10268,54 @@ async function placeOrder() {
   if(window.mtechOrdering) return;
   window.mtechOrdering = true;
   try {
-    const d = await mtechApi('/api/orders', {method:'POST', customer:true, body:{
+    const orderBody = {
       items: cart.map(i => ({id:i.id, qty:i.qty, plan:i.plan || ''})),
-      customer: {name, address, city, pincode},
-      paymentMethod: selectedPaymentMethod
-    }});
+      customer: {name, address, city, pincode}
+    };
+    let d;
+    if(selectedPaymentMethod === 'razorpay') {
+      const checkoutOrder = await mtechApi('/api/payments/razorpay/orders', {
+        method:'POST', customer:true, body:orderBody
+      });
+      await loadRazorpayCheckout();
+      d = await new Promise((resolve, reject) => {
+        let settled = false;
+        const checkout = new window.Razorpay({
+          key: checkoutOrder.keyId,
+          order_id: checkoutOrder.orderId,
+          amount: checkoutOrder.amount,
+          currency: checkoutOrder.currency,
+          name: 'Mtech',
+          description: 'PC components order',
+          prefill: checkoutOrder.customer,
+          theme: {color: '#0b8a8a'},
+          handler: async paymentResponse => {
+            settled = true;
+            try {
+              const verifiedOrder = await mtechApi('/api/payments/razorpay/verify', {
+                method:'POST',
+                customer:true,
+                body:{intentId:checkoutOrder.intentId, ...paymentResponse}
+              });
+              resolve(verifiedOrder);
+            } catch(error) {
+              reject(error);
+            }
+          },
+          modal: {
+            ondismiss: () => {
+              if(!settled) reject(new Error('Payment was cancelled. Your cart is unchanged.'));
+            }
+          }
+        });
+        checkout.open();
+      });
+    } else {
+      d = await mtechApi('/api/orders', {method:'POST', customer:true, body:{
+        ...orderBody,
+        paymentMethod: selectedPaymentMethod
+      }});
+    }
     cart = [];
     saveCart();
     await mtechRefreshProducts();
@@ -10158,25 +10340,31 @@ function renderOrders() {
   }
 
   const html = orders.map(order => {
-    const keysHtml = order.items
+    const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const items = Array.isArray(order.items) ? order.items : [];
+    const keysHtml = items
       .filter(item => Array.isArray(item.assignedKeys) && item.assignedKeys.length)
-      .map(item => `
+      .map(item => {
+        const guideId = Number.isFinite(Number(item.id)) ? Number(item.id) : null;
+        return `
         <div style="background:var(--accent-dim);border-radius:8px;padding:10px 12px;margin-top:8px;">
-          <div style="font-size:12px;font-weight:700;color:var(--accent-text);margin-bottom:6px;">🔑 ${item.name} — License Key${item.assignedKeys.length > 1 ? 's' : ''}</div>
-          ${item.assignedKeys.map(k => `<div style="font-family:monospace;font-size:13px;font-weight:600;">${k}</div>`).join('')}
-          ${item.id ? `<button class="btn-howto" style="margin:8px 0 0;padding:7px;font-size:12px;" onclick="openInstallGuide(${item.id})">▶ How to Install &amp; Register</button>` : ''}
-        </div>`).join('');
+          <div style="font-size:12px;font-weight:700;color:var(--accent-text);margin-bottom:6px;">🔑 ${esc(item.name)} — License Key${item.assignedKeys.length > 1 ? 's' : ''}</div>
+          ${item.assignedKeys.map(k => `<div style="font-family:monospace;font-size:13px;font-weight:600;">${esc(k)}</div>`).join('')}
+          ${guideId ? `<button class="btn-howto" style="margin:8px 0 0;padding:7px;font-size:12px;" onclick="openInstallGuide(${guideId})">▶ How to Install &amp; Register</button>` : ''}
+        </div>`;
+      }).join('');
 
     return `
     <div class="order-card">
       <div class="order-header">
-        <div class="order-id">${order.id}</div>
-        <div class="order-status ${order.status}">${order.status === 'pending' ? '⏳ Pending' : '✅ Completed'}</div>
+        <div class="order-id">${esc(order.id)}</div>
+        <div class="order-status ${order.status === 'pending' ? 'pending' : 'completed'}">${order.status === 'pending' ? '⏳ Pending' : '✅ Completed'}</div>
       </div>
-      <div class="order-items">${order.items.length} items • ${new Date(order.date).toLocaleDateString()}</div>
-      <div class="order-items"><strong>${order.customer.name}</strong></div>
-      <div class="order-items">${order.customer.address}, ${order.customer.city} ${order.customer.pincode}</div>
-      <div class="order-total">Total: ₹${order.total.toLocaleString()}</div>
+      <div class="order-items">${items.length} items • ${new Date(order.date).toLocaleDateString()}</div>
+      <div class="order-items"><strong>${esc(order.customer && order.customer.name)}</strong></div>
+      <div class="order-items">${esc(order.customer && order.customer.address)}, ${esc(order.customer && order.customer.city)} ${esc(order.customer && order.customer.pincode)}</div>
+      <div class="order-items">Payment: ${esc(order.paymentMethod || 'N/A')} · ${order.paymentStatus === 'paid' ? 'Paid' : 'Pending'}</div>
+      <div class="order-total">Total: ₹${Number(order.total || 0).toLocaleString()}</div>
       ${keysHtml}
     </div>`;
   }).join('');
@@ -10199,13 +10387,17 @@ function renderAdmin() {
 
 function initAdminFilterDropdowns() {
   const catSel = document.getElementById('adminFilterCategory');
-  if(catSel && catSel.options.length === 0) {
+  if(catSel) {
+    const selectedCategory = catSel.value || 'All';
     catSel.innerHTML = '<option value="All">All Categories</option>' + CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
+    catSel.value = selectedCategory === 'All' || CATEGORIES.includes(selectedCategory) ? selectedCategory : 'All';
     updateAdminSubFilterOptions();
   }
   const bdCat = document.getElementById('bulkDeleteCategory');
-  if(bdCat && bdCat.options.length === 0) {
+  if(bdCat) {
+    const selectedCategory = bdCat.value || CATEGORIES[0];
     bdCat.innerHTML = CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
+    bdCat.value = CATEGORIES.includes(selectedCategory) ? selectedCategory : CATEGORIES[0];
     updateBulkDeleteSubOptions();
   }
 }
@@ -10218,8 +10410,9 @@ function updateAdminSubFilterOptions() {
 }
 
 function updateBulkDeleteSubOptions() {
-  const cat = document.getElementById('bulkDeleteCategory').value;
+  const cat = document.getElementById('bulkDeleteCategory')?.value;
   const subSel = document.getElementById('bulkDeleteSubcategory');
+  if(!subSel) return;
   const subs = CATEGORY_STRUCTURE[cat] || [];
   subSel.innerHTML = subs.map(s => `<option value="${s}">${s}</option>`).join('');
 }
@@ -10293,7 +10486,7 @@ function renderAdminOrders() {
   const list = window.adminOrders || [];
   const rows = list.map(o => `<tr>
     <td>${esc(o.id)}<div style="font-size:11px;color:var(--muted);">${(o.items||[]).map(i => esc(i.name) + ' × ' + esc(i.qty)).join('<br>')}</div></td>
-    <td>${esc(o.customer.name)}<div style="font-size:11px;color:var(--muted);">${esc(o.customerEmail || '')}<br>${esc(o.customer.address)}, ${esc(o.customer.city)} ${esc(o.customer.pincode)}<br>Payment: ${esc(o.paymentMethod || '')}</div></td>
+    <td>${esc(o.customer.name)}<div style="font-size:11px;color:var(--muted);">${esc(o.customerEmail || '')}<br>${esc(o.customer.address)}, ${esc(o.customer.city)} ${esc(o.customer.pincode)}<br>Payment: ${esc(o.paymentMethod || '')} · ${esc(o.paymentStatus || 'pending')}</div></td>
     <td>₹${Number(o.total).toLocaleString()}</td>
     <td><select onchange="setOrderStatus('${esc(o.id)}', this.value)"><option value="pending"${o.status === 'pending' ? ' selected' : ''}>Pending</option><option value="completed"${o.status === 'completed' ? ' selected' : ''}>Completed</option></select></td>
     <td>${new Date(o.date).toLocaleDateString()}</td></tr>`).join('');
@@ -10302,22 +10495,87 @@ function renderAdminOrders() {
 async function setOrderStatus(id, status) {
   try {
     await mtechApi('/api/admin/orders/' + encodeURIComponent(id), {method:'PATCH', admin:true, body:{status}});
-    const o = (window.adminOrders || []).find(x => x.id === id); if(o) o.status = status;
+    await mtechRefreshProducts();
+    await mtechRefreshAdminOrders();
     showToast('Order updated', 'success');
-  } catch(e) { showToast(e.message, 'error'); }
+  } catch(e) {
+    await mtechRefreshAdminOrders();
+    showToast(e.message, 'error');
+  }
 }
 async function mtechRefreshAdminOrders() {
-  try { window.adminOrders = await mtechApi('/api/admin/orders', {admin:true}); renderAdminOrders(); } catch(e) {}
+  try {
+    await mtechRefreshProducts();
+    window.adminOrders = await mtechApi('/api/admin/orders', {admin:true});
+    renderAdminOrders();
+    renderInventoryStats();
+  } catch(e) {
+    showToast('Could not load orders: ' + e.message, 'error');
+  }
 }
 
+let inventoryPage = 1;
+const INVENTORY_PAGE_SIZE = 60;
+
 function renderInventoryStats() {
-  let stats = '';
-  CATEGORIES.forEach(cat => {
-    const catProducts = products.filter(p => p.category === cat);
-    const totalStock = catProducts.reduce((sum, p) => sum + Number(p.stock || 0), 0);
-    stats += `<div class="stat-card" style="background:var(--surface);padding:16px;margin-bottom:10px;border-radius:8px;border:1px solid var(--border);"><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:600;">${cat}</span><span style="font-size:20px;font-weight:700;color:var(--accent-text);">${totalStock}</span></div><div style="font-size:12px;color:var(--muted);margin-top:4px;">${catProducts.length} products</div></div>`;
+  const statsEl = document.getElementById('inventoryStats');
+  const productsEl = document.getElementById('inventoryProducts');
+  if(!statsEl || !productsEl) return;
+  const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const pendingByProduct = new Map();
+  (window.adminOrders || []).filter(order => order.status === 'pending').forEach(order => {
+    (order.items || []).forEach(item => {
+      const id = String(item.id);
+      pendingByProduct.set(id, (pendingByProduct.get(id) || 0) + Number(item.qty || 0));
+    });
   });
-  document.getElementById('inventoryStats').innerHTML = stats;
+  const pendingTotal = [...pendingByProduct.values()].reduce((sum, qty) => sum + qty, 0);
+  const totalStock = products.reduce((sum, product) => sum + Number(product.stock || 0), 0);
+  statsEl.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">
+    <div class="stat-card" style="background:var(--surface);padding:14px;border-radius:9px;border:1px solid var(--border);"><div style="font-size:12px;color:var(--muted);">Products</div><strong style="font-size:22px;">${products.length.toLocaleString()}</strong></div>
+    <div class="stat-card" style="background:var(--surface);padding:14px;border-radius:9px;border:1px solid var(--border);"><div style="font-size:12px;color:var(--muted);">Current stock</div><strong style="font-size:22px;">${totalStock.toLocaleString()}</strong></div>
+    <div class="stat-card" style="background:var(--surface);padding:14px;border-radius:9px;border:1px solid var(--border);"><div style="font-size:12px;color:var(--muted);">Pending order units</div><strong style="font-size:22px;color:var(--accent-text);">${pendingTotal.toLocaleString()}</strong></div>
+  </div>`;
+  const categorySelect = document.getElementById('inventoryCategory');
+  if(categorySelect) {
+    const selected = categorySelect.value || 'All';
+    categorySelect.innerHTML = '<option value="All">All Categories</option>' + CATEGORIES.map(category => `<option value="${esc(category)}">${esc(category)}</option>`).join('');
+    categorySelect.value = CATEGORIES.includes(selected) ? selected : 'All';
+  }
+  const search = (document.getElementById('inventorySearch')?.value || '').trim().toLowerCase();
+  const category = categorySelect?.value || 'All';
+  const filtered = products.filter(product => {
+    if(category !== 'All' && product.category !== category) return false;
+    return !search || `${product.id} ${product.name} ${product.category} ${product.subcategory || ''}`.toLowerCase().includes(search);
+  });
+  const totalPages = Math.max(1, Math.ceil(filtered.length / INVENTORY_PAGE_SIZE));
+  inventoryPage = Math.min(Math.max(1, inventoryPage), totalPages);
+  const start = (inventoryPage - 1) * INVENTORY_PAGE_SIZE;
+  const pageItems = filtered.slice(start, start + INVENTORY_PAGE_SIZE);
+  productsEl.innerHTML = pageItems.length ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;">
+    ${pageItems.map(product => {
+      const stock = Math.max(0, Number(product.stock || 0));
+      const pending = pendingByProduct.get(String(product.id)) || 0;
+      const available = Math.max(0, stock - pending);
+      return `<article style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;min-width:0;">
+        <div style="font-size:11px;color:var(--muted);">ID ${esc(product.id)} · ${esc(product.category)}</div>
+        <div title="${esc(product.name)}" style="font-weight:650;margin:6px 0 10px;min-height:38px;overflow-wrap:anywhere;">${esc(product.name)}</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;text-align:center;">
+          <div style="background:var(--surface-2);border-radius:7px;padding:8px 4px;"><div style="font-size:10px;color:var(--muted);">Stock</div><strong>${stock}</strong></div>
+          <div style="background:var(--surface-2);border-radius:7px;padding:8px 4px;"><div style="font-size:10px;color:var(--muted);">Pending</div><strong>${pending}</strong></div>
+          <div style="background:var(--surface-2);border-radius:7px;padding:8px 4px;"><div style="font-size:10px;color:var(--muted);">Available</div><strong>${available}</strong></div>
+        </div>
+        <button class="action-btn edit" style="margin-top:10px;" data-product-id="${esc(product.id)}" onclick="openInventoryProduct(this.dataset.productId)">Edit product</button>
+      </article>`;
+    }).join('')}
+  </div>` : '<div class="cart-empty"><p>No products match your search.</p></div>';
+  const pager = document.getElementById('inventoryPager');
+  if(pager) pager.innerHTML = totalPages > 1 ? `<button class="action-btn edit" ${inventoryPage <= 1 ? 'disabled' : ''} onclick="inventoryPage--;renderInventoryStats();">← Prev</button><span style="color:var(--muted);">Page ${inventoryPage} of ${totalPages} · ${filtered.length} products</span><button class="action-btn edit" ${inventoryPage >= totalPages ? 'disabled' : ''} onclick="inventoryPage++;renderInventoryStats();">Next →</button>` : `<span style="color:var(--muted);">${filtered.length} products</span>`;
+}
+
+function openInventoryProduct(id) {
+  const product = products.find(item => String(item.id) === String(id));
+  if(product) openEditProductModal(product.id);
 }
 
 function switchAdminTab(tab, btn) {
@@ -10462,6 +10720,10 @@ function saveProduct() {
     products.push({id:newId, name, category, subcategory, price, stock, specs, installVideo, downloadLink, image, plans});
     showToast('Product added!', 'success');
   }
+  if(!CATEGORIES.includes(category)) CATEGORIES.push(category);
+  if(!Array.isArray(CATEGORY_STRUCTURE[category])) CATEGORY_STRUCTURE[category] = [];
+  if(!CATEGORY_STRUCTURE[category].includes(subcategory)) CATEGORY_STRUCTURE[category].push(subcategory);
+  saveCategoryStructure();
   products.forEach(pr => { if(hasPlans(pr) && Array.isArray(pr.licenseKeys)) syncStockFromKeys(pr); });
   try { localStorage.setItem('products', JSON.stringify(products)); }
   catch(e) { showToast('Storage is full. Use a photo link or smaller photos instead.', 'error'); return; }
@@ -10857,8 +11119,9 @@ function parseCsvToProducts(text) {
     const subcategory = (r[idx.subcategory] || '').trim();
     if(!name || !category || !subcategory) { errors.push(`Row ${i+1}: missing name/category/subcategory, skipped`); continue; }
     const idRaw = idx.id > -1 ? (r[idx.id] || '').trim() : '';
+    const normalizedId = idRaw ? String(idRaw).trim() : '';
     items.push({
-      id: idRaw ? Number(idRaw) : null,
+      id: normalizedId ? Number(normalizedId) : null,
       downloadLink: idx.downloadLink > -1 ? (r[idx.downloadLink] || '').trim() : '',
       name, category, subcategory,
       price: idx.price > -1 ? toNum(r[idx.price]) : 0,
@@ -10872,7 +11135,7 @@ function parseCsvToProducts(text) {
 function previewBulkImport() {
   const text = document.getElementById('bulkCsvText').value;
   const {items, errors} = parseCsvToProducts(text);
-  const toUpdate = items.filter(it => it.id && products.some(p => p.id === it.id)).length;
+  const toUpdate = items.filter(it => it.id && products.some(p => String(p.id) === String(it.id))).length;
   const toAdd = items.length - toUpdate;
   const newCats = [...new Set(items.map(it => it.category))].filter(c => !CATEGORIES.includes(c));
   let html = `<div style="padding:10px;background:var(--bg2,#f5f7fa);border-radius:8px;">
@@ -10897,7 +11160,7 @@ function confirmBulkImport() {
     if(!CATEGORY_STRUCTURE[it.category].includes(it.subcategory)) CATEGORY_STRUCTURE[it.category].push(it.subcategory);
 
     if(it.id) {
-      const idx = products.findIndex(p => p.id === it.id);
+      const idx = products.findIndex(p => String(p.id) === String(it.id));
       if(idx > -1) {
         const oldSpecs = products[idx].specs; products[idx] = {...products[idx], name: it.name, category: it.category, subcategory: it.subcategory, price: it.price, stock: it.stock, specs: it.specs, ...(it.downloadLink ? {downloadLink: it.downloadLink} : {})};
         if(oldSpecs !== it.specs) delete products[idx].attrs;
@@ -11017,7 +11280,7 @@ function deleteLicenseKey(index) {
 function addCategory() {
   const name = prompt('Enter new category name:'); if(!name) return;
   const cat = name.trim(); if(!cat || CATEGORIES.includes(cat)) return showToast('Category already exists or is invalid', 'error');
-  CATEGORIES.push(cat); CATEGORY_STRUCTURE[cat] = []; updateCategoryOptions(); renderAdmin(); renderHome(); showToast('Category added!', 'success');
+  CATEGORIES.push(cat); CATEGORY_STRUCTURE[cat] = []; saveCategoryStructure(); updateCategoryOptions(); renderAdmin(); renderHome(); showToast('Category added!', 'success');
 }
 
 function deleteCategory(cat) {
@@ -11030,6 +11293,7 @@ function deleteCategory(cat) {
   localStorage.setItem('products', JSON.stringify(products));
   const i = CATEGORIES.indexOf(cat); if(i >= 0) CATEGORIES.splice(i, 1);
   delete CATEGORY_STRUCTURE[cat];
+  saveCategoryStructure();
   if(selectedCategory === cat) selectedCategory = 'All';
   updateCategoryOptions(); renderAdmin(); renderHome(); showToast('Category deleted!', 'success');
 }
@@ -11038,14 +11302,14 @@ function renameCategory(oldName) {
   const name = prompt('New category name:', oldName); if(!name || name.trim() === oldName) return;
   const n = name.trim(); if(CATEGORIES.includes(n)) return showToast('Category already exists', 'error');
   const i=CATEGORIES.indexOf(oldName); if(i<0) return; CATEGORIES[i]=n; CATEGORY_STRUCTURE[n]=CATEGORY_STRUCTURE[oldName]||[]; delete CATEGORY_STRUCTURE[oldName];
-  products.forEach(p=>{if(p.category===oldName)p.category=n;}); localStorage.setItem('products',JSON.stringify(products)); renderAdmin(); renderHome();
+  products.forEach(p=>{if(p.category===oldName)p.category=n;}); localStorage.setItem('products',JSON.stringify(products)); saveCategoryStructure(); renderAdmin(); renderHome();
 }
 
 function addSubcategory() {
   const cat = prompt('Category name:\n'+CATEGORIES.join(', ')); if(!cat || !CATEGORIES.includes(cat.trim())) return showToast('Enter an existing category', 'error');
   const sub = prompt('Enter sub category name:'); if(!sub) return;
   const c=cat.trim(), n=sub.trim(); CATEGORY_STRUCTURE[c]=CATEGORY_STRUCTURE[c]||[]; if(CATEGORY_STRUCTURE[c].includes(n)) return showToast('Subcategory already exists', 'error');
-  CATEGORY_STRUCTURE[c].push(n); renderAdmin(); renderHome(); showToast('Subcategory added!', 'success');
+  CATEGORY_STRUCTURE[c].push(n); saveCategoryStructure(); updateCategoryOptions(); renderAdmin(); renderHome(); showToast('Subcategory added!', 'success');
 }
 
 function deleteSubcategory(cat, sub) {
@@ -11057,14 +11321,14 @@ function deleteSubcategory(cat, sub) {
   products = products.filter(p => !(p.category === cat && p.subcategory === sub));
   localStorage.setItem('products', JSON.stringify(products));
   const arr = CATEGORY_STRUCTURE[cat] || []; const i = arr.indexOf(sub); if(i >= 0) arr.splice(i, 1);
-  renderAdmin(); renderHome(); showToast('Subcategory deleted!', 'success');
+  saveCategoryStructure(); updateCategoryOptions(); renderAdmin(); renderHome(); showToast('Subcategory deleted!', 'success');
 }
 
 function renameSubcategory(cat, oldSub) {
   const n=prompt('New sub category name:', oldSub); if(!n || n.trim()===oldSub) return; const name=n.trim();
   if((CATEGORY_STRUCTURE[cat]||[]).includes(name)) return showToast('Subcategory already exists', 'error');
   const arr=CATEGORY_STRUCTURE[cat]||[]; const i=arr.indexOf(oldSub); if(i<0) return; arr[i]=name;
-  products.forEach(p=>{if(p.category===cat&&p.subcategory===oldSub)p.subcategory=name;}); localStorage.setItem('products',JSON.stringify(products)); renderAdmin(); renderHome();
+  products.forEach(p=>{if(p.category===cat&&p.subcategory===oldSub)p.subcategory=name;}); localStorage.setItem('products',JSON.stringify(products)); saveCategoryStructure(); updateCategoryOptions(); renderAdmin(); renderHome();
 }
 
 // ==================== UTILITIES ====================
@@ -11106,9 +11370,23 @@ async function mtechBoot() {
       localStorage.setItem('mtechDataVersion', DATA_VERSION);
     }
   } catch(e) { console.warn('Server products not reachable, using saved copy'); }
+  try {
+    const response = await fetch('/api/categories', {cache:'no-store'});
+    if(!response.ok) throw new Error(`Category catalog request failed (${response.status}).`);
+    const catalog = await response.json();
+    if(!catalog || !Array.isArray(catalog.categories) || !catalog.structure || typeof catalog.structure !== 'object') {
+      throw new Error('Category catalog response has an invalid format.');
+    }
+    localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(catalog));
+  } catch(error) {
+    console.warn('Server categories not reachable, using saved categories:', error);
+  }
   await loadMyOrders();
 }
-mtechBoot().then(init);
+mtechBoot().then(async () => {
+  await init();
+  if(document.documentElement.classList.contains('admin-standalone')) unlockAdmin();
+});
 </script>
 
 <script>
