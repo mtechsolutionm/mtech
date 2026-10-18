@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: mtech-store-api
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm run start:production
+    disk:
+      name: mtech-store-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: DATA_DIR
+        value: /var/data
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        sync: false
