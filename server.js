@@ -841,7 +841,7 @@ async function route(request, response) {
     const body = await readJson(request, 64 * 1024);
     const address = validateOrderAddress(body.customer);
     const paymentMethod = String(body.paymentMethod || '');
-    if (!['cod', 'bank'].includes(paymentMethod)) fail(400, 'Choose a valid payment method.');
+    if (!['bank'].includes(paymentMethod)) fail(400, 'Choose a valid payment method.');
     return serializeOrderMutation(async () => {
       const items = validateOrderItems(body.items);
       const order = {
@@ -858,6 +858,55 @@ async function route(request, response) {
       orderStore.orders.push(order);
       await saveOrderStore();
       return sendJson(response, 201, { success: true, order });
+    });
+  }
+
+  if (request.method === 'GET' && pathname === '/api/auth/google-config') {
+    return sendJson(response, 200, { googleClientId: process.env.GOOGLE_CLIENT_ID || '' });
+  }
+
+  if (request.method === 'POST' && pathname === '/api/customers/google') {
+    rateLimit(`customer-google:${ip}`, 30, 15 * 60 * 1000);
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    if (!clientId) fail(503, 'Google sign-in is not configured. Set GOOGLE_CLIENT_ID in .env.');
+    const body = await readJson(request);
+    const credential = String(body.credential || '');
+    if (!credential || credential.length > 4096) fail(400, 'Google sign-in failed. Please try again.');
+    let info;
+    try {
+      const googleResponse = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(credential));
+      info = await googleResponse.json();
+      if (!googleResponse.ok) info = null;
+    } catch (error) {
+      fail(502, 'Could not reach Google to verify sign-in. Please try again.');
+    }
+    const issuerOk = info && ['accounts.google.com', 'https://accounts.google.com'].includes(info.iss);
+    const verified = info && (info.email_verified === true || info.email_verified === 'true');
+    if (!info || info.aud !== clientId || !issuerOk || !verified || Number(info.exp) * 1000 < Date.now()) {
+      fail(401, 'Google sign-in could not be verified.');
+    }
+    const email = normalizeEmail(info.email);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) fail(401, 'Google account has no valid email.');
+    const displayName = String(info.name || email.split('@')[0]).trim().slice(0, 120) || 'Customer';
+    return serializeOrderMutation(async () => {
+      let customer = orderStore.customers.find(item => item.email === email);
+      let created = false;
+      if (!customer) {
+        customer = { id: crypto.randomUUID(), name: displayName, email, salt: '', passwordHash: '', googleId: String(info.sub || ''), createdAt: new Date().toISOString() };
+        orderStore.customers.push(customer);
+        created = true;
+        await saveOrderStore();
+      } else if (!customer.googleId && info.sub) {
+        customer.googleId = String(info.sub);
+        await saveOrderStore();
+      }
+      return sendJson(response, created ? 201 : 200, {
+        success: true,
+        created,
+        token: createCustomerSession(customer),
+        name: customer.name,
+        email: customer.email
+      });
     });
   }
 

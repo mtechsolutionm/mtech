@@ -7,16 +7,27 @@
   <title>Admin | Mtech</title>
   <style>
     html,body{width:100%;height:100%;margin:0}
-    body{font:16px/1.5 Arial,sans-serif;color:#17212b;background:#f1f5f9}
+    body{font:16px/1.5 Inter,Arial,sans-serif;color:#f1f3f8;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%201600%201000%27%20preserveAspectRatio%3D%27xMidYMid%20slice%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%234f46ff%27%20stroke-width%3D%271.2%27%20opacity%3D%27.55%27%3E%3Cellipse%20cx%3D%27420%27%20cy%3D%27430%27%20rx%3D%27520%27%20ry%3D%27190%27%20transform%3D%27rotate%28-24%20420%20430%29%27/%3E%3Cellipse%20cx%3D%271230%27%20cy%3D%27480%27%20rx%3D%27460%27%20ry%3D%27330%27%20transform%3D%27rotate%2862%201230%20480%29%27/%3E%3C/g%3E%3C/svg%3E") center/cover no-repeat fixed,#1c1f2b}
     iframe{display:block;width:100%;height:100%;border:0}
     [hidden]{display:none!important}
-    main{box-sizing:border-box;max-width:620px;margin:10vh auto;padding:32px;background:#fff;border:1px solid #dbe3ec;border-radius:12px}
-    h1{margin-top:0;font-size:24px}
-    code{padding:2px 6px;background:#eef2f7;border-radius:4px}
-    a{color:#087e7b}
+    .topbar{display:flex;align-items:center;gap:12px;padding:14px 28px;background:#000;border-bottom:1px solid #1c1e27}
+    .logo{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-weight:800;color:#111;background:linear-gradient(135deg,#8b85ff,#4f46ff)}
+    .brand{font-weight:800;font-size:20px;letter-spacing:.02em}
+    main{box-sizing:border-box;max-width:620px;margin:9vh auto;padding:34px;background:rgba(18,20,27,.92);border:1px solid #262a36;border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+    h1{margin-top:0;font-size:26px;color:#fff}
+    p,li{color:#b9c0cf}
+    ol{padding-left:20px}
+    code{padding:2px 8px;background:#1d212c;border:1px solid #2b3040;border-radius:6px;color:#b4b7ff}
+    a{color:#6a63ff}
+    .btn{display:inline-block;margin:8px 8px 0 0;padding:11px 20px;border-radius:8px;border:0;background:#4f46ff;color:#fff;font:700 15px Inter,Arial,sans-serif;text-decoration:none;cursor:pointer;box-shadow:0 8px 20px rgba(79,70,255,.3)}
+    .btn:hover{background:#6a63ff}
+    .btn.alt{background:transparent;color:#fff;border:1.5px solid #3a4052;box-shadow:none}
+    .btn.alt:hover{border-color:#4f46ff;color:#6a63ff}
+    #server-status{margin:16px 0 0;font-size:14px;color:#8a93a6}
   </style>
 </head>
 <body>
+  <div class="topbar"><div class="logo">M</div><div class="brand">Mtech</div></div>
   <main id="local-file-notice" hidden>
     <h1>Start the Mtech server to open Admin</h1>
     <p>This file was opened directly from your computer. Admin needs the Mtech server for sign-in, data, and API access.</p>
@@ -25,12 +36,28 @@
       <li>Run <code>npm start</code>.</li>
       <li>Open <a href="http://localhost:8000/admin">http://localhost:8000/admin</a>.</li>
     </ol>
-    <p>Do not open <code>admin.html</code> by double-clicking it.</p>
+    <p>Once the server is running, this page opens Admin by itself.</p>
+    <a class="btn" href="http://localhost:8000/admin">Open Admin</a>
+    <button class="btn alt" type="button" id="retry-btn">Check again</button>
+    <p id="server-status">Looking for the Mtech server on localhost:8000...</p>
   </main>
   <iframe id="admin-frame" title="Mtech Admin" hidden></iframe>
   <script>
     if (location.protocol === 'file:') {
       document.getElementById('local-file-notice').hidden = false;
+      const ADMIN_URL = 'http://localhost:8000/admin';
+      const statusEl = document.getElementById('server-status');
+      let redirected = false;
+      function checkServer() {
+        if (redirected) return;
+        statusEl.textContent = 'Looking for the Mtech server on localhost:8000...';
+        fetch('http://localhost:8000/', {mode: 'no-cors', cache: 'no-store'})
+          .then(function () { redirected = true; statusEl.textContent = 'Server found. Opening Admin...'; location.replace(ADMIN_URL); })
+          .catch(function () { statusEl.textContent = 'Server is not running yet. Run npm start, this page will open Admin automatically.'; });
+      }
+      document.getElementById('retry-btn').addEventListener('click', checkServer);
+      checkServer();
+      setInterval(checkServer, 3000);
     } else {
       const adminFrame = document.getElementById('admin-frame');
       adminFrame.src = '/?admin-standalone=1';
