@@ -544,6 +544,18 @@ function sendJson(response, status, body) {
   response.end(JSON.stringify(body));
 }
 
+// Raw bytes are needed for webhook signatures (the signature covers the exact bytes Razorpay sent).
+async function readRawBody(request, maxBytes) {
+  const chunks = [];
+  let size = 0;
+  for await (const chunk of request) {
+    size += chunk.length;
+    if (size > maxBytes) fail(413, 'Request is too large.');
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
 async function readJson(request, maxBytes = 16 * 1024) {
   let body = '';
   for await (const chunk of request) {
@@ -590,10 +602,24 @@ function normalizeIp(value) {
   return net.isIP(ip) ? ip : '';
 }
 
+// True only for requests that really came through OUR Vercel proxy (api/[...path].js).
+// The proxy proves itself with a shared secret (PROXY_SHARED_SECRET, same value on Vercel and here).
+function isTrustedProxy(request) {
+  const secret = String(process.env.PROXY_SHARED_SECRET || '');
+  if (secret.length < 24) return false;
+  const supplied = String(request.headers['x-mtech-proxy-secret'] || '');
+  if (supplied.length !== secret.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(supplied), Buffer.from(secret));
+}
+
 // Real visitor IP. Proxy headers (Cloudflare Tunnel, ngrok, nginx on this PC) are trusted
 // ONLY when the connection itself comes from this machine (loopback). A visitor who connects
 // directly from the internet/LAN can never fake their IP with these headers.
 function getClientIp(request) {
+  if (isTrustedProxy(request)) {
+    const forwardedIp = normalizeIp(request.headers['x-mtech-client-ip']);
+    if (forwardedIp) return forwardedIp;
+  }
   const remote = normalizeIp(request.socket.remoteAddress) || 'unknown';
   if (remote !== '127.0.0.1' && remote !== '::1') return remote;
   const cloudflare = normalizeIp(request.headers['cf-connecting-ip']);
@@ -708,6 +734,9 @@ async function sendSmsOtp(mobile, code, accountType = 'dealer') {
 
 // ---- Security headers (#6) -------------------------------------------------------------
 function isSecureRequest(request) {
+  if (isTrustedProxy(request)) {
+    return String(request.headers['x-forwarded-proto'] || '').split(',')[0].trim().toLowerCase() === 'https';
+  }
   const remote = normalizeIp(request.socket.remoteAddress);
   if (remote !== '127.0.0.1' && remote !== '::1') return Boolean(request.socket.encrypted);
   // Request came through a proxy/tunnel on this PC (Cloudflare Tunnel, ngrok, nginx): trust its scheme.
@@ -1076,6 +1105,75 @@ async function route(request, response) {
       orderStore.orders.push(order);
       await saveOrderStore();
       return sendJson(response, 201, { success: true, order });
+    });
+  }
+
+  // Razorpay calls this by itself when a payment is captured. It creates the order even if the
+  // customer closed the browser before /razorpay/verify ran (money taken, no order).
+  if (request.method === 'POST' && pathname === '/api/payments/razorpay/webhook') {
+    rateLimit(`razorpay-webhook:${ip}`, 300, 15 * 60 * 1000);
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    if (!webhookSecret) fail(503, 'Razorpay webhook is not configured. Set RAZORPAY_WEBHOOK_SECRET in .env.');
+    const rawBody = await readRawBody(request, 256 * 1024);
+    const signature = String(request.headers['x-razorpay-signature'] || '');
+    if (!/^[a-f\d]{64}$/i.test(signature)) fail(400, 'Invalid webhook signature.');
+    const expectedSignature = crypto.createHmac('sha256', webhookSecret).update(rawBody).digest();
+    if (!crypto.timingSafeEqual(expectedSignature, Buffer.from(signature, 'hex'))) fail(400, 'Invalid webhook signature.');
+    let event;
+    try {
+      event = JSON.parse(rawBody.toString('utf8'));
+    } catch {
+      fail(400, 'Webhook body must be valid JSON.');
+    }
+    const payment = event && event.payload && event.payload.payment && event.payload.payment.entity;
+    if (!['payment.captured', 'order.paid'].includes(event && event.event) || !payment || payment.status !== 'captured') {
+      return sendJson(response, 200, { success: true, ignored: true });
+    }
+    const paymentId = String(payment.id || '');
+    const razorpayOrderId = String(payment.order_id || '');
+    return serializeOrderMutation(async () => {
+      const intent = orderStore.paymentIntents.find(item => item.razorpayOrderId === razorpayOrderId);
+      if (!intent || !paymentId) return sendJson(response, 200, { success: true, ignored: true });
+      if (intent.status === 'completed') return sendJson(response, 200, { success: true, alreadyProcessed: true });
+      if (payment.currency !== 'INR' || payment.amount !== Math.round(intent.total * 100)) {
+        console.error(`Razorpay webhook: amount mismatch for ${paymentId}; needs manual review.`);
+        return sendJson(response, 200, { success: true, ignored: true });
+      }
+      // The money is already captured, so the order is always created. If stock ran out or the
+      // payment window expired meanwhile, the order is flagged so it can be fixed or refunded by hand.
+      let reviewNote = '';
+      try {
+        verifyPaymentIntentInventory(intent);
+      } catch (error) {
+        reviewNote = error.message || 'Stock changed after payment.';
+      }
+      if (!reviewNote && intent.expiresAt <= Date.now()) reviewNote = 'Payment session had expired before the payment was confirmed.';
+      const order = {
+        id: `MT-${Date.now().toString(36).toUpperCase()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`,
+        paymentIntentId: intent.id,
+        customer: intent.customer,
+        customerEmail: intent.customerEmail,
+        items: structuredClone(intent.items),
+        total: intent.total,
+        paymentMethod: payment.method || 'razorpay',
+        paymentStatus: 'paid',
+        paymentProvider: 'razorpay',
+        razorpayOrderId,
+        razorpayPaymentId: paymentId,
+        status: 'pending',
+        source: 'webhook',
+        date: new Date().toISOString()
+      };
+      if (reviewNote) {
+        order.needsReview = true;
+        order.reviewNote = reviewNote;
+        console.error(`Razorpay webhook: order ${order.id} created but needs review: ${reviewNote}`);
+      }
+      intent.status = 'completed';
+      intent.paymentId = paymentId;
+      orderStore.orders.push(order);
+      await saveOrderStore();
+      return sendJson(response, 200, { success: true, orderId: order.id });
     });
   }
 
