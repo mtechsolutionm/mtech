@@ -1,5 +1,5 @@
 <html lang="en"><head>
-<script>if(new URLSearchParams(location.search).has('admin-standalone'))document.documentElement.classList.add('admin-standalone');</script>
+
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -598,34 +598,36 @@ body{background:var(--mtech-bg)!important;color:var(--mtech-text)!important;font
 
 <style id="mtech-checkout-theme">
 #checkoutPage.page:not(#homePage),#cartPage.page:not(#homePage){
-  --text:#111;--muted:#6b6b73;--surface:#fff;--surface-2:#f4f4f6;--border:#e3e3e8;--accent:#ff4d00;--accent-dim:#fff0e8;--accent-text:#e04300;
-  color:#111;min-height:100vh;padding:28px 0 60px;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%201600%201000%27%20preserveAspectRatio%3D%27xMidYMid%20slice%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23ff5a1f%27%20stroke-width%3D%271.3%27%20opacity%3D%27.75%27%3E%3Cellipse%20cx%3D%27420%27%20cy%3D%27430%27%20rx%3D%27520%27%20ry%3D%27190%27%20transform%3D%27rotate%28-24%20420%20430%29%27/%3E%3Cellipse%20cx%3D%271230%27%20cy%3D%27430%27%20rx%3D%27460%27%20ry%3D%27330%27%20transform%3D%27rotate%2862%201230%20430%29%27/%3E%3C/g%3E%3C/svg%3E") center/cover no-repeat fixed,#ececee}
-#checkoutPage h1,#cartPage h1{color:#111;font-size:38px;letter-spacing:-.5px;margin:6px 0 18px}
-#checkoutPage h3,#cartPage h3{color:#111}
+  --text:#f7f8fc;--muted:#a9afbd;--surface:#111319;--surface-2:#181b24;--border:#2a2d38;--accent:#ff4d00;--accent-dim:#2a1a12;--accent-text:#ff7a3d;
+  color:#f7f8fc;min-height:100vh;padding:28px 0 60px;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%201600%201000%27%20preserveAspectRatio%3D%27xMidYMid%20slice%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23ff5a1f%27%20stroke-width%3D%271.3%27%20opacity%3D%27.75%27%3E%3Cellipse%20cx%3D%27420%27%20cy%3D%27430%27%20rx%3D%27520%27%20ry%3D%27190%27%20transform%3D%27rotate%28-24%20420%20430%29%27/%3E%3Cellipse%20cx%3D%271230%27%20cy%3D%27430%27%20rx%3D%27460%27%20ry%3D%27330%27%20transform%3D%27rotate%2862%201230%20430%29%27/%3E%3C/g%3E%3C/svg%3E") center/cover no-repeat fixed,#ececee}
+#checkoutPage h1,#cartPage h1{color:#f7f8fc;font-size:38px;letter-spacing:-.5px;margin:6px 0 18px}
+#checkoutPage h3,#cartPage h3{color:#f7f8fc!important}
 #checkoutPage .container,#cartPage .container{max-width:1150px!important;margin:0 auto!important}
 #checkoutPage .checkout-form{display:grid;grid-template-columns:1.25fr 1fr;gap:0;max-width:none;padding:0;overflow:hidden;
-  background:#fff;border:0;border-radius:18px;box-shadow:0 30px 70px rgba(0,0,0,.18),0 0 0 8px #0d0d0d}
+  background:#111319;border:1px solid #2a2d38;border-radius:18px;box-shadow:0 30px 70px rgba(0,0,0,.5),0 0 0 8px #0d0d0d}
 .co-left{padding:36px 40px}
-.co-right{padding:36px 40px;border-left:1px solid #e6e6ea;background:#fff}
+.co-right{padding:36px 40px;border-left:1px solid #2a2d38;background:#111319}
+#checkoutPage #checkoutSummary,#checkoutPage #checkoutSummary *{color:#f7f8fc}
 .co-title{font-size:24px;margin:0 0 22px!important}
-.co-label{font-weight:600;font-size:14px;margin-bottom:10px;color:#111}
-#checkoutPage .form-group label{color:#111;font-weight:600}
-#checkoutPage .form-group input,#checkoutPage .form-group select{background:transparent;border:0;border-bottom:1.5px solid #cfcfd6;border-radius:0;padding:10px 2px;color:#111}
+.co-label{font-weight:600;font-size:14px;margin-bottom:10px;color:#f7f8fc}
+#checkoutPage .form-group label{color:#cfd4e0!important;font-weight:600}
+#checkoutPage .form-group input,#checkoutPage .form-group select{background:transparent;border:0;border-bottom:1.5px solid #3a3f4e;border-radius:0;padding:10px 2px;color:#f7f8fc}
 #checkoutPage .form-group input:focus{border-bottom-color:#ff4d00;box-shadow:none}
 #checkoutPage .payment-methods{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
-#checkoutPage .payment-option{background:#fff;color:#111;border:1.5px solid #d6d6dc;border-radius:999px;padding:10px 18px;font-size:14px}
-#checkoutPage .payment-option:hover{border-color:#111}
-#checkoutPage .payment-option.active{background:#fff;border-color:#111;box-shadow:0 0 0 3px rgba(255,77,0,.18)}
-#checkoutPage .co-right>p{color:#6b6b73!important}
+#checkoutPage .payment-option{background:#181b24;color:#f7f8fc;border:1.5px solid #2f3340;border-radius:999px;padding:10px 18px;font-size:14px}
+#checkoutPage .payment-option:hover{border-color:#ff7a3d}
+#checkoutPage .payment-option.active{background:#22140c;border-color:#ff4d00;box-shadow:0 0 0 3px rgba(255,77,0,.18)}
+#checkoutPage .co-right>p{color:#a9afbd!important}
 #checkoutPage .btn-checkout,#cartPage .btn-checkout{background:#ff4d00;color:#fff;border-radius:8px;font-weight:700;box-shadow:0 8px 20px rgba(255,77,0,.28)}
-#checkoutPage .btn-checkout[onclick*="cart"]{background:#fff;color:#ff4d00;border:1.5px solid #ff4d00;box-shadow:none}
-#cartPage .cart-item,#cartPage .cart-summary{background:#fff;border:0;border-bottom:1px solid #e6e6ea;border-radius:0;color:#111}
-#cartPage .cart-summary{border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.08)}
-#cartPage .qty-btn{background:#fff;border-color:#e3e3e8;color:#111}
+#checkoutPage .btn-checkout[onclick*="cart"]{background:transparent!important;color:#ff7a3d!important;border:1.5px solid #ff4d00;box-shadow:none}
+#cartPage .cart-item,#cartPage .cart-summary{background:#111319!important;border:0;border-bottom:1px solid #2a2d38;border-radius:0;color:#f7f8fc!important}
+#cartPage .cart-summary{border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+#cartPage .qty-btn{background:#181b24;border-color:#2f3340;color:#f7f8fc}
 body:has(#checkoutPage.active) .topbar,body:has(#cartPage.active) .topbar{background:#000!important}
 body:has(#checkoutPage.active) .nav-btn:hover,body:has(#cartPage.active) .nav-btn:hover{background:#ff4d00!important;border-color:#ff4d00!important;box-shadow:none}
-@media(max-width:820px){#checkoutPage .checkout-form{grid-template-columns:1fr;box-shadow:0 10px 30px rgba(0,0,0,.15)}
-  .co-left,.co-right{padding:24px 20px}.co-right{border-left:0;border-top:1px solid #e6e6ea}}
+@media(max-width:820px){#checkoutPage .checkout-form{grid-template-columns:1fr;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+  .co-left,.co-right{padding:24px 20px}.co-right{border-left:0;border-top:1px solid #2a2d38}}
+#checkoutPage input:-webkit-autofill,#accountPage input:-webkit-autofill{-webkit-box-shadow:0 0 0 1000px #0b0d12 inset!important;-webkit-text-fill-color:#f7f8fc!important;caret-color:#f7f8fc;transition:background-color 9999s ease-in-out 0s}
 </style>
 
 <style id="mtech-brand-name">
@@ -662,6 +664,200 @@ body:has(#checkoutPage.active) .nav-btn:hover,body:has(#cartPage.active) .nav-bt
 #adminPage .action-btn.delete{background:rgba(255,107,107,.16);color:#ff8f8f}
 #adminPage .admin-tab>div[style*="background"],#adminPage .admin-card{background:#0a0e17!important;border:1px solid #262b3a;border-radius:16px;color:#fff}
 @media(max-width:900px){#adminPage .container{display:block}#adminPage .admin-header{position:static;flex-direction:row;flex-wrap:wrap;margin-bottom:16px}#adminPage .admin-header::before{width:100%}}
+</style>
+
+<style id="mtech-dark-inner-pages">
+/* Mtech dark premium theme for all inner pages and the admin dashboard */
+:root{
+ --surface:#111319!important;--surface-2:#191c24!important;--border:#2a2d38!important;
+ --text:#f7f8fc!important;--muted:#a9afbd!important;
+ --primary:#8b5cf6!important;--primary-color:#8b5cf6!important;
+ --blue:#8b5cf6!important;--accent:#ffb51b!important;
+}
+.page:not(#homePage),#adminPage{
+ background:radial-gradient(ellipse at 50% 0%,#17142a 0%,#0b0c11 48%,#08090d 100%)!important;
+ color:#f7f8fc!important;
+}
+.page:not(#homePage) .container,#adminPage .container{color:#f7f8fc}
+.page:not(#homePage) h1,.page:not(#homePage) h2,.page:not(#homePage) h3,
+.page:not(#homePage) h4,.page:not(#homePage) h5,#adminPage h1,#adminPage h2,
+#adminPage h3,#adminPage h4,#adminPage h5{color:#f7f8fc}
+.page:not(#homePage) p,.page:not(#homePage) label,.page:not(#homePage) small,
+.page:not(#homePage) .muted,#adminPage p,#adminPage label,#adminPage small{color:#a9afbd}
+.page:not(#homePage) .card,.page:not(#homePage) .panel,.page:not(#homePage) .section,
+.page:not(#homePage) .summary-card,.page:not(#homePage) .order-card,
+.page:not(#homePage) .checkout-card,.page:not(#homePage) .cart-item,
+.page:not(#homePage) .order-item,#adminPage .card,#adminPage .panel,
+#adminPage .admin-card,#adminPage .stat-card,#adminPage .summary-card,
+#adminPage .admin-section,#adminPage .table-wrap{
+ background:#111319!important;color:#f7f8fc!important;
+ border-color:#2a2d38!important;box-shadow:0 10px 30px #0003!important;
+}
+.page:not(#homePage) input:not([type=checkbox]):not([type=radio]),
+.page:not(#homePage) select,.page:not(#homePage) textarea,
+#adminPage input:not([type=checkbox]):not([type=radio]),
+#adminPage select,#adminPage textarea{
+ background:#0d0f15!important;color:#f7f8fc!important;
+ border:1px solid #343744!important;border-radius:7px;
+}
+.page:not(#homePage) input::placeholder,.page:not(#homePage) textarea::placeholder,
+#adminPage input::placeholder,#adminPage textarea::placeholder{color:#777f90!important}
+.page:not(#homePage) input:focus,.page:not(#homePage) select:focus,
+.page:not(#homePage) textarea:focus,#adminPage input:focus,#adminPage select:focus,
+#adminPage textarea:focus{outline:none!important;border-color:#8b5cf6!important;box-shadow:0 0 0 3px #8b5cf626!important}
+.page:not(#homePage) button:not(.btn-add-outline):not(.btn-wishlist),
+#adminPage button:not(.btn-add-outline):not(.btn-wishlist){
+ transition:background .18s,border-color .18s,transform .18s;
+}
+.page:not(#homePage) .btn,.page:not(#homePage) button.primary,
+.page:not(#homePage) .primary-btn,.page:not(#homePage) .btn-primary,
+#adminPage .btn,#adminPage button.primary,#adminPage .primary-btn,#adminPage .btn-primary{
+ background:linear-gradient(135deg,#7c3aed,#4f46e5)!important;color:#fff!important;
+ border-color:#8b5cf6!important;border-radius:7px!important;
+}
+.page:not(#homePage) .btn:hover,.page:not(#homePage) button.primary:hover,
+.page:not(#homePage) .primary-btn:hover,.page:not(#homePage) .btn-primary:hover,
+#adminPage .btn:hover,#adminPage button.primary:hover,#adminPage .primary-btn:hover,
+#adminPage .btn-primary:hover{filter:brightness(1.12)}
+.page:not(#homePage) a,#adminPage a{color:#c4b5fd}
+.page:not(#homePage) table,#adminPage table{background:#111319!important;color:#e8eaf2!important;border-color:#2a2d38!important}
+.page:not(#homePage) th,#adminPage th{background:#191c24!important;color:#f7f8fc!important;border-color:#2a2d38!important}
+.page:not(#homePage) td,#adminPage td{background:#111319!important;color:#d9dce6!important;border-color:#2a2d38!important}
+.page:not(#homePage) tr:hover td,#adminPage tr:hover td{background:#191c24!important}
+.page:not(#homePage) hr,#adminPage hr{border-color:#2a2d38!important}
+.page:not(#homePage) .empty-state,#adminPage .empty-state{background:#111319!important;color:#a9afbd!important;border-color:#2a2d38!important}
+.page:not(#homePage) .badge,#page:not(#homePage) .status,#adminPage .badge{border-color:#343744!important}
+#adminPage{padding-bottom:36px}
+#adminPage .admin-header,#adminPage .admin-nav,#adminPage .admin-tabs{
+ background:#101116!important;color:#f7f8fc!important;border-color:#2a2d38!important;
+}
+#adminPage .admin-tabs button.active,#adminPage .admin-nav button.active{
+ background:linear-gradient(135deg,#7c3aed,#4f46e5)!important;color:#fff!important;
+}
+@media(max-width:640px){
+ .page:not(#homePage) .container,#adminPage .container{padding-left:12px!important;padding-right:12px!important}
+ .page:not(#homePage) .card,#page:not(#homePage) .panel,#adminPage .card,#adminPage .panel{border-radius:10px!important}
+}
+</style>
+
+
+<style id="mtech-global-dark-modal-fix">
+/* Final consistency pass: modal overlays often live outside #adminPage, so theme them globally. */
+.modal .modal-content,
+.modal .keys-modal-content,
+.modal .pcb-modal-box,
+#productModal .modal-content,
+#keysModal .modal-content,
+#inventoryProductModal .modal-content,
+#customerAuthModal .modal-content {
+  background: linear-gradient(160deg,#151722 0%,#0d0f16 100%) !important;
+  color: #f4f5fb !important;
+  border: 1px solid #343447 !important;
+  box-shadow: 0 24px 70px rgba(0,0,0,.65) !important;
+}
+.modal .modal-content h1,.modal .modal-content h2,.modal .modal-content h3,
+.modal .modal-content label,.modal .modal-content .form-group label,
+.modal .modal-content p,.modal .modal-content small,
+.modal .modal-content .modal-header,
+.modal .modal-content .modal-header h2,
+.modal .modal-content .pcb-modal-title,
+.modal .modal-content .form-group > div:not([class*="preview"]),
+#productModal label,#keysModal label {
+  color: #e8eaf5 !important;
+}
+.modal .modal-content .form-group > div[style*="font-size"],
+.modal .modal-content .hint,.modal .modal-content .help-text,
+#productModal #modalStockHint {
+  color: #aeb5ca !important;
+}
+.modal .modal-content input:not([type="checkbox"]):not([type="radio"]),
+.modal .modal-content select,.modal .modal-content textarea,
+#productModal input,#productModal select,#productModal textarea,
+#keysModal input,#keysModal select,#keysModal textarea {
+  background: #090b12 !important;
+  color: #f7f8ff !important;
+  border: 1px solid #3b4054 !important;
+  border-radius: 9px !important;
+  color-scheme: dark;
+}
+.modal .modal-content input::placeholder,.modal .modal-content textarea::placeholder,
+#productModal input::placeholder { color:#7f879d !important; }
+.modal .modal-content input:focus,.modal .modal-content select:focus,
+.modal .modal-content textarea:focus,#productModal input:focus,
+#productModal select:focus,#productModal textarea:focus {
+  border-color:#9b7bff !important;
+  box-shadow:0 0 0 3px rgba(139,92,246,.18) !important;
+  outline:none !important;
+}
+.modal .modal-content select option,#productModal select option { background:#11131b !important;color:#f7f8ff !important; }
+.modal .modal-close { color:#d6d8e8 !important; }
+.modal .modal-close:hover { background:#28263a !important;color:#fff !important; }
+.modal .modal-content button:not(.modal-close) { color:#f7f8ff; }
+.modal .modal-content .btn,.modal .modal-content .btn-primary,
+.modal .modal-content button.primary { background:linear-gradient(135deg,#7c3aed,#4f46e5) !important;color:#fff !important;border-color:#8b5cf6 !important; }
+.modal .modal-content .action-btn.edit { background:rgba(34,211,197,.14) !important;color:#5eead4 !important;border-color:#286b68 !important; }
+.modal .modal-content .action-btn.delete { background:rgba(255,107,107,.16) !important;color:#ff9999 !important; }
+.modal .modal-content .image-preview,.modal .modal-content .img-preview,
+.modal .modal-content .photo-preview { background:#0b0d14 !important;border-color:#35394a !important;color:#c5cbe0 !important; }
+.modal .modal-content hr { border-color:#303447 !important; }
+@media(max-width:640px){
+ .modal .modal-content { max-height:94vh !important; overflow-y:auto !important; }
+}
+</style>
+
+<style id="mtech-versions-css">
+/* Software versions editor (admin) + download table (customer) - uses theme variables */
+#productModal .vz-sub{font-size:11px;color:var(--muted);margin:-2px 0 8px;}
+#productModal .vz-ver{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;}
+#productModal .vz-head{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;}
+#productModal .vz-head>div:first-child{grid-column:1 / -1;}
+#productModal .vz-head label,#productModal .vz-row label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin:0 0 4px;}
+#productModal .vz-in{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font:inherit;font-size:13px;}
+#productModal .vz-in:focus{outline:none;border-color:var(--accent);}
+#productModal .vz-row{display:grid;grid-template-columns:1fr 110px auto;grid-template-areas:'lang arch del' 'links links links';gap:10px;margin-top:10px;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface);align-items:end;}
+#productModal .vz-row>div:nth-child(1){grid-area:lang;}
+#productModal .vz-row>div:nth-child(2){grid-area:arch;}
+#productModal .vz-row>div:nth-child(3){grid-area:links;}
+#productModal .vz-row>button{grid-area:del;}
+#productModal button[onclick="clearProductImage()"]{background:var(--surface-2);color:var(--text);border:1px solid var(--border);}
+#productModal button[onclick="clearProductImage()"]:hover{border-color:var(--accent);color:var(--accent);}
+#productModal .vz-lk{display:grid;grid-template-columns:110px 1fr auto;gap:6px;margin-bottom:6px;}
+#productModal .vz-btn{background:none;border:0;padding:4px 2px;cursor:pointer;font:inherit;font-size:12px;font-weight:700;color:var(--accent);}
+#productModal .vz-btn.red{color:var(--danger);}
+#productModal .vz-add{width:100%;padding:10px;border:2px solid var(--accent);border-radius:10px;background:transparent;color:var(--accent);font:inherit;font-weight:700;cursor:pointer;}
+.vzd-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px;}
+.vzd-tab{padding:9px 14px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font:inherit;font-size:13px;font-weight:700;cursor:pointer;}
+.vzd-tab.on{background:var(--accent);border-color:var(--accent);color:#111;}
+.vzd-build{font-size:12px;color:var(--muted);margin:0 0 8px;}
+.vzd-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;}
+.vzd-table{width:100%;border-collapse:collapse;font-size:13px;}
+.vzd-table th,.vzd-table td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+.vzd-table th{background:var(--surface-2);font-size:12px;color:var(--muted);}
+.vzd-table tr:last-child td{border-bottom:0;}
+.vzd-link{display:inline-block;margin:0 6px 6px 0;padding:7px 12px;border-radius:8px;border:1px solid var(--accent);background:transparent;color:var(--accent);font:inherit;font-size:12px;font-weight:700;cursor:pointer;}
+.vzd-link:hover{background:var(--accent);color:#111;}
+</style>
+<style id="mtech-account-css">
+#accountPage .acct-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;min-width:0;}
+#accountPage .acct-center{text-align:center;padding:36px 18px;}
+#accountPage .acct-head{display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap;}
+#accountPage .acct-avatar{width:52px;height:52px;font-size:22px;flex:none;}
+#accountPage .acct-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px;}
+#accountPage .acct-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;}
+#accountPage .acct-stat span{display:block;font-size:12px;color:var(--muted);}
+#accountPage .acct-stat strong{font-size:22px;}
+#accountPage .acct-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;}
+#accountPage .acct-pays{display:grid;gap:10px;}
+#accountPage .acct-pay{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface-2,var(--surface));color:var(--text);cursor:pointer;font:inherit;}
+#accountPage .acct-pay:hover{border-color:var(--accent);}
+#accountPage .acct-pay.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,181,27,.15);}
+#accountPage .acct-pay-icon{font-size:24px;}
+#accountPage .acct-pay strong{display:block;}
+#accountPage .acct-pay small{display:block;color:var(--muted);font-size:12px;margin-top:2px;}
+#accountPage .acct-pay>span:nth-child(2){flex:1;min-width:0;}
+#accountPage .acct-pay-check{font-weight:800;color:var(--accent);}
+#accountPage .acct-order{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--border);}
+#accountPage .acct-order small{display:block;color:var(--muted);font-size:12px;}
 </style>
 </head>
 <body>
@@ -729,8 +925,6 @@ body:has(#checkoutPage.active) .nav-btn:hover,body:has(#cartPage.active) .nav-bt
       <button class="nav-btn" id="ordersBtn" onclick="goPage('orders')">Orders</button>
       <div id="customerAuthArea"></div>
       <button class="nav-btn login-nav-btn dealer-nav-btn" onclick="showDealerAuth()">Dealer Login</button>
-      <button class="nav-btn" id="adminBtn" onclick="unlockAdmin()">Admin Login</button>
-      <button class="nav-btn" id="adminLogoutBtn" onclick="adminLogout()" style="display: none;">Admin Logout</button>
       <button class="nav-btn" id="cartBtn" onclick="goPage('cart')" style="position:relative;"><span style="display: contents;">
         <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg> Cart
         </span><span class="cart-count" id="cartCount" style="display:none;">0</span>
@@ -753,7 +947,7 @@ body:has(#checkoutPage.active) .nav-btn:hover,body:has(#cartPage.active) .nav-bt
   <div class="mtech-utility"><span>⚡ MTECH PC COMPONENTS & GAMING</span><span>Build better. Play harder. Create more.</span><span>India · Secure shopping</span></div>
   <div class="mtech-mainnav">
     <div class="mtech-wordmark">M<span>TECH</span></div>
-    <div class="mtech-search" role="search"><input id="mtechHeroSearch" type="search" placeholder="Search graphics cards, CPUs, RAM..." aria-label="Search products"><button type="button" id="mtechHeroSearchBtn" aria-label="Search products">⌕</button></div>
+    <div class="mtech-search" role="search"><input id="mtechHeroSearch" type="search" name="q" placeholder="Search graphics cards, CPUs, RAM..." aria-label="Search products" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" readonly onfocus="this.removeAttribute('readonly')"><button type="button" id="mtechHeroSearchBtn" aria-label="Search products">⌕</button></div>
     <nav class="mtech-navchips" aria-label="Featured categories"><a href="#mtechFeaturedCategories" onclick="return false;" data-mtech-category="PC Build">PC Components</a><a href="#mtechFeaturedCategories" onclick="return false;" data-mtech-category="PC Build">Gaming PCs</a><a href="#mtechFeaturedCategories" onclick="return false;" data-mtech-category="Software">Software</a><a href="#mtechFeaturedCategories" onclick="return false;" data-mtech-category="Antivirus">Antivirus</a></nav>
   </div>
   <div class="mtech-hero-main">
@@ -4882,7 +5076,7 @@ body:has(#checkoutPage.active) .nav-btn:hover,body:has(#cartPage.active) .nav-bt
       </div>
       <div id="pcbModalFilters" class="pcb-chips"></div>
       <div class="pcb-modal-tools">
-        <input type="text" id="pcbModalSearch" placeholder="Search..." oninput="pcbPickerSearch=this.value;pcbPickerPage=1;renderPCBPicker();">
+        <input type="text" id="pcbModalSearch" autocomplete="off" placeholder="Search..." oninput="pcbPickerSearch=this.value;pcbPickerPage=1;renderPCBPicker();">
         <select id="pcbModalSort" onchange="pcbPickerSort=this.value;pcbPickerPage=1;renderPCBPicker();">
           <option value="az" selected="selected">Title A-Z</option>
           <option value="za">Title Z-A</option>
@@ -4954,6 +5148,14 @@ body:has(#checkoutPage.active) .nav-btn:hover,body:has(#cartPage.active) .nav-bt
     </div>
   </div>
 
+  <!-- ACCOUNT PAGE -->
+  <div id="accountPage" class="page">
+    <div class="container">
+      <h1>My Account</h1>
+      <div id="accountContent"></div>
+    </div>
+  </div>
+
   <!-- ADMIN PAGE -->
   <div id="adminPage" class="page">
     <div class="container">
@@ -4973,7 +5175,7 @@ body:has(#checkoutPage.active) .nav-btn:hover,body:has(#cartPage.active) .nav-bt
       <div id="productsTab" class="admin-tab" style="display: none;">
         <button class="btn-checkout" style="margin-bottom:16px;background:var(--success);" onclick="openAddProductModal()">+ Add Product</button>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-          <input type="text" id="adminSearchInput" placeholder="Search by name or ID..." style="flex:1;min-width:160px;padding:8px;border:1px solid var(--border);border-radius:6px;" oninput="adminProductPage=1;renderAdminProducts();">
+          <input type="text" id="adminSearchInput" autocomplete="off" placeholder="Search by name or ID..." style="flex:1;min-width:160px;padding:8px;border:1px solid var(--border);border-radius:6px;" oninput="adminProductPage=1;renderAdminProducts();">
           <select id="adminFilterCategory" style="padding:8px;border:1px solid var(--border);border-radius:6px;" onchange="updateAdminSubFilterOptions();adminProductPage=1;renderAdminProducts();"><option value="All" selected="selected">All Categories</option><option value="Antivirus">Antivirus</option><option value="Software">Software</option><option value="PC Build">PC Build</option></select>
           <select id="adminFilterSubcategory" style="padding:8px;border:1px solid var(--border);border-radius:6px;" onchange="adminProductPage=1;renderAdminProducts();"><option value="All" selected="selected">All Sub Categories</option></select>
         </div>
@@ -5394,7 +5596,7 @@ Corsair Vengeance 32GB DDR5 6000MHz"></textarea>
         <p style="color:var(--muted);margin-top:-6px;">Pending quantities are reserved from the stock shown. Stock is deducted when an order is marked completed.</p>
         <div id="inventoryStats"></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;">
-          <input id="inventorySearch" type="search" placeholder="Search product name or ID..." oninput="inventoryPage=1;renderInventoryStats();" style="flex:1;min-width:180px;padding:9px;border:1px solid var(--border);border-radius:8px;">
+          <input id="inventorySearch" type="search" autocomplete="off" placeholder="Search product name or ID..." oninput="inventoryPage=1;renderInventoryStats();" style="flex:1;min-width:180px;padding:9px;border:1px solid var(--border);border-radius:8px;">
           <select id="inventoryStockFilter" onchange="inventoryPage=1;renderInventoryStats();" style="padding:9px;border:1px solid var(--border);border-radius:8px;"><option value="all">All stock levels</option><option value="low">Low stock (1-5)</option><option value="out">Out of stock</option></select>
           <select id="inventoryCategory" onchange="inventoryPage=1;renderInventoryStats();" style="padding:9px;border:1px solid var(--border);border-radius:8px;"><option value="All">All Categories</option></select>
         </div>
@@ -5424,7 +5626,7 @@ Corsair Vengeance 32GB DDR5 6000MHz"></textarea>
     </div>
     <div class="footer-col">
       <h3>Customer Care</h3>
-      <a href="#" onclick="goPage('orders');return false;">My Account</a>
+      <a href="#" onclick="goPage('account');return false;">My Account</a>
     </div>
   </div>
   <div class="footer-bottom">© 2026 Mtech PC Components Store. All rights reserved.</div>
@@ -5459,11 +5661,11 @@ Corsair Vengeance 32GB DDR5 6000MHz"></textarea>
       <label>Sub Category</label>
       <select id="modalSubcategory" onchange="toggleModalGroups()"><option value="">Select subcategory</option><option value="Windows" selected="selected">Windows</option></select>
     </div>
-    <div class="form-group">
+    <div class="form-group" id="modalPriceGroup">
       <label>Price (₹)</label>
       <input type="number" id="modalPrice" placeholder="50000" value="7999">
     </div>
-    <div class="form-group">
+    <div class="form-group" id="modalStockGroup">
       <label>Stock Quantity</label>
       <input type="number" id="modalStock" placeholder="10" min="0" value="15">
       <div id="modalStockHint" style="display:none;font-size:11px;color:var(--muted);margin-top:6px;">Stock is auto-calculated from License Keys (use the "Keys" button).</div>
@@ -5481,6 +5683,13 @@ Corsair Vengeance 32GB DDR5 6000MHz"></textarea>
       <label>Software Download Link (Google Drive)</label>
       <input type="text" id="modalDownloadLink" placeholder="https://drive.google.com/file/d/.../view?usp=sharing" value="https://drive.google.com/file/d/17c13xTnOeJfY_Q2GwPtH0-3ODHgSmWGI/view?usp=drive_link">
       <div style="font-size:11px;color:var(--muted);margin-top:6px;">In Drive, right-click the file, choose Share, set "Anyone with the link", then paste the link here.</div>
+    </div>
+    <div class="form-group" id="modalVersionsGroup" style="display:none;">
+      <label>Versions</label>
+      <div class="vz-sub">Add each version, then its language, architecture and one or more download links (website URLs).</div>
+      <div id="modalVersionsList"></div>
+      <button type="button" class="vz-add" onclick="vzAddVersion()">+ Add version</button>
+      <datalist id="vzLabels"><option value="Buzzheavier"><option value="ZeroFS"><option value="Mirror"><option value="Direct"></datalist>
     </div>
     <div class="form-group" id="modalPlansGroup" style="display:none;">
       <label>Plans (Users × Years)</label>
@@ -5516,7 +5725,7 @@ Corsair Vengeance 32GB DDR5 6000MHz"></textarea>
     <div id="customerSignInForm">
       <div class="form-group">
         <label>Email Address</label>
-        <input type="email" id="customerLoginEmail" placeholder="customer@example.com" autocomplete="email">
+        <input type="email" id="customerLoginEmail" name="username" placeholder="customer@example.com" autocomplete="username">
       </div>
       <div class="form-group">
         <label>Password</label>
@@ -8799,6 +9008,7 @@ document.addEventListener('click', function(event) {
 
 // ==================== NAVIGATION ====================
 function unlockAdmin() {
+  return; // admin lives in the separate admin.html
   if(ADMIN_OK) {
     goPage('admin');
     return;
@@ -9065,7 +9275,7 @@ function renderProductCard(p, category, wishlist) {
   return `
     <div class="product-card" onclick="showProductDetail(${p.id})">
       <div class="card-image">
-        ${outOfStock && !isPCBuild ? '<span class="badge-oos">Out of Stock</span>' : ''}
+        ${outOfStock && !isPCBuild && !isSoftware ? '<span class="badge-oos">Out of Stock</span>' : ''}
         ${productImage ? `<img class="p-img" src="${imgAttr(productImage)}" alt="${imgAttr(p.name)}" loading="lazy" onerror="this.onerror=null;this.hidden=true;this.nextElementSibling.hidden=false"><div class="product-image-fallback" hidden>${getProductLogoMarkup(p, category)}</div>` : getProductLogoMarkup(p, category)}
       </div>
       <div class="name">${p.name}</div>
@@ -9073,8 +9283,8 @@ function renderProductCard(p, category, wishlist) {
       ${!isSoftware && !isPCBuild ? `<div class="price-row">
         ${hasPrice ? `<span class="price">${hasPlans(p) ? 'From ' : ''}₹${p.price.toLocaleString()}</span>` : `<span class="price on-request">Price on Request</span>`}
       </div>` : ''}
-      ${!isPCBuild ? `<div class="stock-text">${outOfStock ? 'Out of stock' : 'Stock: ' + p.stock}</div>` : ''}
-      ${isSoftware ? (p.downloadLink ? `<div onclick="event.stopPropagation();">${downloadBtnHtml(p, 'margin-bottom:8px;')}</div>` : '<div class="stock-text">Download link not available</div>') : ''}
+      ${!isPCBuild && !isSoftware ? `<div class="stock-text">${outOfStock ? 'Out of stock' : 'Stock: ' + p.stock}</div>` : ''}
+      ${isSoftware ? (hasSoftwareDownloads(p) ? `<button type="button" class="btn-checkout" style="display:block;width:100%;text-align:center;margin-bottom:8px;" onclick="event.stopPropagation();showProductDetail(${p.id})">⬇ Download</button>` : '<div class="stock-text">Download link not available</div>') : ''}
       ${!isSoftware && !isPCBuild ? `<button class="btn-add-outline" onclick="event.stopPropagation(); addToCart(${p.id});" ${(!hasPrice || outOfStock) ? 'disabled' : ''}>
         🛒 ${hasPrice ? 'Add to Cart' : 'On Request'}
       </button>` : ''}
@@ -9875,7 +10085,7 @@ function showProductDetail(productId) {
             <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">PRICE</div>
             <div id="pdPrice" style="font-size:24px;font-weight:700;color:var(--accent-text);">₹${product.price.toLocaleString()}</div>
           </div>` : ''}
-          ${product.category !== 'PC Build' ? `<div style="background:var(--surface-2);padding:16px;border-radius:8px;text-align:center;">
+          ${product.category !== 'PC Build' && product.category !== 'Software' ? `<div style="background:var(--surface-2);padding:16px;border-radius:8px;text-align:center;">
             <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">STOCK</div>
             <div id="pdStock" style="font-size:24px;font-weight:700;color:${product.stock > 0 ? 'var(--success)' : 'var(--danger)'};">${product.stock > 0 ? product.stock + ' Available' : 'Out of Stock'}</div>
           </div>` : ''}
@@ -9886,7 +10096,7 @@ function showProductDetail(productId) {
           <div style="font-size:15px;font-weight:600;color:var(--accent-text);">${product.specs}</div>
         </div>
 
-        ${hasDownloadLink(product.category, product.subcategory) ? (product.downloadLink ? downloadBtnHtml(product,'margin-bottom:10px;') : '<div class="stock-text">Download link not available</div>') : ''}
+        ${product.category === 'Software' ? softwareVersionsHtml(product) : (hasDownloadLink(product.category, product.subcategory) ? (product.downloadLink ? downloadBtnHtml(product,'margin-bottom:10px;') : '<div class="stock-text">Download link not available</div>') : '')}
         ${product.category === 'Antivirus' ? `<button class="btn-howto" onclick="openInstallGuide(${product.id})">▶ How to Install — Video &amp; Steps</button>` : ''}
         ${showPurchaseButton ? `<button id="pdAddBtn" class="btn-checkout" onclick="${hasPlans(product) ? `addPlanFromDetail(${product.id})` : `addToCart(${product.id}); closeProductDetail();`}" ${product.stock === 0 ? 'disabled' : ''}>
           🛒 Add to Cart - ₹${product.price.toLocaleString()}
@@ -9976,10 +10186,24 @@ function customerLogout() {
 let mtechGoogleReady = null;
 function mtechInitGoogleSignIn() {
   if(mtechGoogleReady) return mtechGoogleReady;
+  const devHost = /^(localhost|127\.0\.0\.1|\[?::1\]?|\d{1,3}(\.\d{1,3}){3})$/.test(location.hostname);
+  const note = msg => {
+    if(!devHost) return;
+    document.querySelectorAll('#customerAuthModal .google-auth-btn').forEach(box => {
+      box.innerHTML = '<small style="color:var(--muted);text-align:center;line-height:1.4;">' + msg + '</small>';
+      box.parentElement.style.display = 'block';
+    });
+  };
   mtechGoogleReady = (async () => {
     try {
-      const cfg = await mtechApi('/api/auth/google-config');
-      if(!cfg.googleClientId) return;
+      if(location.hostname !== 'localhost' && /^(127\.0\.0\.1|\[?::1\]?|\d{1,3}(\.\d{1,3}){3})$/.test(location.hostname)) {
+        note('Google sign-in works only on http://localhost:8000 (not on an IP address).');
+        return;
+      }
+      let cfg;
+      try { cfg = await mtechApi('/api/auth/google-config'); }
+      catch(e) { mtechGoogleReady = null; note('Google sign-in unavailable: cannot reach the server.'); return; }
+      if(!cfg.googleClientId) { note('Google sign-in is off: GOOGLE_CLIENT_ID is not set on the server. Add it to .env and restart the server.'); return; }
       await new Promise((resolve, reject) => {
         if(window.google && google.accounts && google.accounts.id) return resolve();
         const sc = document.createElement('script');
@@ -9996,6 +10220,7 @@ function mtechInitGoogleSignIn() {
       });
     } catch(e) {
       mtechGoogleReady = null;
+      note('Google script could not load. Check your internet connection or turn off the ad-blocker.');
       console.warn('Google sign-in unavailable:', e);
     }
   })();
@@ -10308,15 +10533,170 @@ function renderDealersAdmin(){
   tb.innerHTML=all.length?all.map(d=>`<tr style="border-top:1px solid var(--border);"><td style="padding:8px;">${esc(d.name)}</td><td style="padding:8px;">${esc(d.email)}</td><td style="padding:8px;">${esc(d.mobile||'')}</td><td style="padding:8px;font-family:monospace;font-weight:700;">${esc(d.code||'')}</td><td style="padding:8px;white-space:nowrap;">${d.code?`<button class="action-btn edit" onclick="copyText('${esc(d.code)}','Dealer code copied')">Copy code</button> `:''}${stored.has(d.email)?`<button class="action-btn" style="background:var(--danger);color:#fff;" onclick="deleteDealer('${esc(d.email).replace(/'/g,'')}')">Delete</button>`:''}</td></tr>`).join(''):'<tr><td colspan="5" style="padding:12px;color:var(--muted);">No dealers yet.</td></tr>';
 }
 
+// ==================== PAYMENT AVAILABILITY ====================
+let mtechPaymentConfig = null;
+async function mtechLoadPaymentConfig() {
+  if(mtechPaymentConfig) return mtechPaymentConfig;
+  try { mtechPaymentConfig = await mtechApi('/api/payments/config'); }
+  catch(e) { mtechPaymentConfig = {razorpay: true}; }
+  return mtechPaymentConfig;
+}
+function mtechOnlinePaymentOff() { return !!(mtechPaymentConfig && mtechPaymentConfig.razorpay === false); }
+function mtechApplyPaymentAvailability() {
+  if(!mtechOnlinePaymentOff()) return;
+  const online = document.querySelector('#checkoutPage .payment-option[data-method="razorpay"]');
+  if(online) online.style.display = 'none';
+  const note = document.querySelector('#checkoutPage .co-right > p');
+  if(note) note.style.display = 'none';
+  const bank = document.querySelector('#checkoutPage .payment-option[data-method="bank"]');
+  if(selectedPaymentMethod === 'razorpay' && bank) setPaymentMethod(bank);
+  selectedPaymentMethod = 'bank';
+}
+
+// ==================== MY ACCOUNT PAGE ====================
+const ACCT_PAYMENT_METHODS = {
+  bank: {icon: '🏦', title: 'Bank Transfer', note: 'Pay by bank transfer. Your order stays Pending until the payment is confirmed.'},
+  razorpay: {icon: '🔒', title: 'UPI, Cards & Net Banking', note: 'Pay online. Payments are securely processed by Razorpay.'}
+};
+function acctEsc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function acctProfileKey(email) { return 'mtechCustomerProfile:' + String(email || '').toLowerCase(); }
+function acctGetProfile() {
+  const u = getCustomerSession();
+  if(!u || !u.email) return {};
+  try { return JSON.parse(localStorage.getItem(acctProfileKey(u.email)) || '{}') || {}; } catch(e) { return {}; }
+}
+function acctSaveProfile(patch) {
+  const u = getCustomerSession();
+  if(!u || !u.email) return;
+  const next = Object.assign({}, acctGetProfile(), patch);
+  try { localStorage.setItem(acctProfileKey(u.email), JSON.stringify(next)); } catch(e) {}
+}
+function acctSaveDetails() {
+  const val = id => (document.getElementById(id)?.value || '').trim();
+  const pincode = val('acctPincode');
+  if(pincode && !/^\d{6}$/.test(pincode)) { showToast('Pincode must be 6 digits', 'error'); return; }
+  acctSaveProfile({name: val('acctName'), phone: val('acctPhone'), address: val('acctAddress'), city: val('acctCity'), pincode});
+  showToast('Details saved', 'success');
+}
+function acctSetPayment(method) {
+  if(!ACCT_PAYMENT_METHODS[method]) return;
+  acctSaveProfile({paymentMethod: method});
+  selectedPaymentMethod = method;
+  renderAccount();
+  showToast(ACCT_PAYMENT_METHODS[method].title + ' set as your payment method', 'success');
+}
+function acctApplyToCheckout() {
+  const profile = acctGetProfile();
+  const setIfEmpty = (id, value) => { const el = document.getElementById(id); if(el && !el.value && value) el.value = value; };
+  setIfEmpty('customerName', profile.name || (getCustomerSession() || {}).name);
+  setIfEmpty('customerAddress', profile.address);
+  setIfEmpty('customerCity', profile.city);
+  setIfEmpty('customerPincode', profile.pincode);
+  if(ACCT_PAYMENT_METHODS[profile.paymentMethod]) {
+    const opt = document.querySelector('.payment-option[data-method="' + profile.paymentMethod + '"]');
+    if(opt) setPaymentMethod(opt);
+  }
+}
+function acctLogout() { customerLogout(); goPage('home'); }
+function renderAccount() {
+  const el = document.getElementById('accountContent');
+  if(!el) return;
+  const u = getCustomerSession();
+  if(!u) {
+    el.innerHTML = `<div class="acct-card acct-center"><p style="margin:0 0 14px;color:var(--muted);">Sign in to see your account, orders and payment method.</p><button class="btn-checkout" style="max-width:260px;" onclick="showCustomerAuth()">Login</button></div>`;
+    return;
+  }
+  if(mtechPaymentConfig === null) mtechLoadPaymentConfig().then(renderAccount);
+  const profile = acctGetProfile();
+  const method = ACCT_PAYMENT_METHODS[profile.paymentMethod] && !(profile.paymentMethod === 'razorpay' && mtechOnlinePaymentOff()) ? profile.paymentMethod : 'bank';
+  const list = Array.isArray(orders) ? orders : [];
+  const pending = list.filter(o => o.status === 'pending').length;
+  const completed = list.filter(o => o.status !== 'pending').length;
+  const spent = list.reduce((sum, o) => sum + Number(o.total || 0), 0);
+  const recent = [...list].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+  const money = n => '\u20B9' + Number(n || 0).toLocaleString();
+  const stat = (label, value) => `<div class="acct-stat"><span>${label}</span><strong>${value}</strong></div>`;
+  const field = (id, label, value, ph, extra) => `<div class="form-group"><label>${label}</label><input type="text" id="${id}" value="${acctEsc(value)}" placeholder="${ph}" ${extra || ''}></div>`;
+  const payCards = Object.keys(ACCT_PAYMENT_METHODS).filter(key => !(key === 'razorpay' && mtechOnlinePaymentOff())).map(key => {
+    const m = ACCT_PAYMENT_METHODS[key];
+    return `<button type="button" class="acct-pay ${key === method ? 'active' : ''}" onclick="acctSetPayment('${key}')"><span class="acct-pay-icon">${m.icon}</span><span><strong>${m.title}</strong><small>${m.note}</small></span><span class="acct-pay-check">${key === method ? '\u2713' : ''}</span></button>`;
+  }).join('');
+  const orderRows = recent.length ? recent.map(o => `<div class="acct-order"><div><strong>${acctEsc(o.id)}</strong><small>${new Date(o.date).toLocaleDateString()} \u00B7 ${(o.items || []).length} items \u00B7 ${acctEsc(o.paymentMethod || 'N/A')}</small></div><div style="text-align:right;"><strong>${money(o.total)}</strong><small>${o.status === 'pending' ? '\u23F3 Pending' : '\u2705 Completed'}</small></div></div>`).join('') : '<p style="margin:0;color:var(--muted);">No orders yet.</p>';
+  el.innerHTML = `
+    <div class="acct-card acct-head">
+      <span class="customer-avatar acct-avatar">${acctEsc((u.name || u.email || 'C').charAt(0).toUpperCase())}</span>
+      <div style="min-width:0;flex:1;"><h2 style="margin:0;">${acctEsc(u.name || 'Customer')}</h2><div style="color:var(--muted);overflow-wrap:anywhere;">${acctEsc(u.email)}</div></div>
+      <button class="nav-btn" onclick="acctLogout()">Logout</button>
+    </div>
+    <div class="acct-stats">
+      ${stat('Total orders', list.length)}${stat('Pending', pending)}${stat('Completed', completed)}${stat('Total spent', money(spent))}
+    </div>
+    <div class="acct-grid">
+      <section class="acct-card">
+        <h3 style="margin-top:0;">Profile &amp; Delivery Details</h3>
+        ${field('acctName', 'Full Name', profile.name || u.name || '', 'Your name')}
+        <div class="form-group"><label>Email</label><input type="text" value="${acctEsc(u.email)}" disabled></div>
+        ${field('acctPhone', 'Mobile', profile.phone || '', 'Mobile number', 'inputmode="tel" maxlength="15"')}
+        ${field('acctAddress', 'Address', profile.address || '', 'Street address')}
+        <div class="form-row">${field('acctCity', 'City', profile.city || '', 'City')}${field('acctPincode', 'Pincode', profile.pincode || '', 'Pincode', 'maxlength="6" inputmode="numeric"')}</div>
+        <button class="btn-checkout" onclick="acctSaveDetails()">Save Details</button>
+        <p style="margin:10px 0 0;color:var(--muted);font-size:12px;">Saved on this device and filled in automatically at checkout.</p>
+      </section>
+      <section class="acct-card">
+        <h3 style="margin-top:0;">Payment Method</h3>
+        <div class="acct-pays">${payCards}</div>
+        <p style="margin:10px 0 0;color:var(--muted);font-size:12px;">Your chosen method is pre-selected at checkout. You can change it there for any order.</p>
+      </section>
+    </div>
+    <section class="acct-card" style="margin-top:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;"><h3 style="margin:0;">Recent Orders</h3><button class="nav-btn" onclick="goPage('orders')">View all orders</button></div>
+      ${orderRows}
+    </section>`;
+}
+
 function renderCustomerAuthArea() {
   const el=document.getElementById('customerAuthArea'); if(!el) return;
   const u=getCustomerSession();
   if(u) {
     const initial=(u.name||u.email||'C').charAt(0).toUpperCase();
-    el.innerHTML=`<div class="customer-user"><span class="customer-avatar">${initial}</span><span class="customer-name" style="font-size:13px;font-weight:700;">${u.name||u.email}</span><button class="nav-btn" onclick="customerLogout()">Logout</button></div>`;
+    el.innerHTML=`<div class="customer-user"><span class="customer-avatar" style="cursor:pointer;" title="My Account" onclick="goPage('account')">${initial}</span><span class="customer-name" style="font-size:13px;font-weight:700;cursor:pointer;" title="My Account" onclick="goPage('account')">${u.name||u.email}</span><button class="nav-btn" onclick="customerLogout()">Logout</button></div>`;
   } else {
-    el.innerHTML='<button class="nav-btn login-nav-btn" onclick="showCustomerAuth()">👤 Customer Login</button>';
+    el.innerHTML='<button class="nav-btn login-nav-btn" onclick="showCustomerAuth()">👤 Login</button>';
   }
+}
+// ==================== SOFTWARE DOWNLOAD TABLE (customer) ====================
+function swVersions(p){ return (Array.isArray(p && p.versions) ? p.versions : []).filter(v => (v.rows || []).some(r => (r.links || []).length)); }
+function hasSoftwareDownloads(p){ return swVersions(p).length > 0 || !!(p && p.downloadLink); }
+function swEsc(v){ return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function softwareVersionsHtml(p){
+  const vs = swVersions(p);
+  if(!vs.length) return p.downloadLink ? downloadBtnHtml(p,'margin-bottom:10px;') : '<div class="stock-text">Download link not available</div>';
+  const idx = p.versions.indexOf.bind(p.versions);
+  const tabs = vs.length > 1 ? `<div class="vzd-tabs">${vs.map((v,i) => `<button type="button" class="vzd-tab${i===0?' on':''}" data-vzd-tab="${p.id}" onclick="vzdShow(${p.id},${i})">${swEsc(v.name)}</button>`).join('')}</div>` : '';
+  const panels = vs.map((v,i) => `
+    <div data-vzd-panel="${p.id}" data-i="${i}" style="${i===0?'':'display:none;'}">
+      <div style="font-weight:700;margin-bottom:2px;">${swEsc(v.name)}</div>
+      ${v.build ? `<div class="vzd-build">Build ${swEsc(v.build)}</div>` : ''}
+      <div class="vzd-wrap"><table class="vzd-table"><thead><tr><th>Language</th><th>Arch</th><th>Download</th></tr></thead><tbody>
+      ${v.rows.filter(r => (r.links || []).length).map(r => { const ri = v.rows.indexOf(r), vi = idx(v); return `<tr><td>${swEsc(r.lang)}</td><td>${swEsc(r.arch)}</td><td>${r.links.map((l,li) => `<button type="button" class="vzd-link" onclick="softwareDownload(${p.id},${vi},${ri},${li})">${swEsc(l.label)} ⬇</button>`).join('')}</td></tr>`; }).join('')}
+      </tbody></table></div>
+    </div>`).join('');
+  return `<div style="margin-bottom:16px;"><div style="font-size:13px;color:var(--muted);margin-bottom:8px;">DOWNLOADS</div>${tabs}${panels}</div>`;
+}
+function vzdShow(pid, i){
+  document.querySelectorAll('[data-vzd-panel="' + pid + '"]').forEach(el => { el.style.display = (+el.dataset.i === i) ? '' : 'none'; });
+  document.querySelectorAll('[data-vzd-tab="' + pid + '"]').forEach((b, n) => b.classList.toggle('on', n === i));
+}
+function softwareDownload(pid, vi, ri, li){
+  const p = products.find(x => String(x.id) === String(pid));
+  const l = p && p.versions && p.versions[vi] && p.versions[vi].rows[ri] && p.versions[vi].rows[ri].links[li];
+  if(!l || !l.url) { showToast('Download link not available', 'error'); return; }
+  if(!getCustomerSession() || !localStorage.getItem('mtechCustomerToken')) {
+    showToast('Please sign in, then tap the download link again', 'error');
+    showCustomerAuth('signin');
+    return;
+  }
+  window.open(l.url, '_blank', 'noopener');
 }
 function downloadBtnHtml(p, style) {
   if(!p.downloadLink) return '';
@@ -10450,6 +10830,7 @@ window.addEventListener('popstate', function(e) {
 });
 
 function goPage(page, fromHistory) {
+  if(page === 'admin') { if(fromHistory) { try { history.replaceState({page: 'home'}, ''); } catch(e) {} goPage('home', true); } return; }
   if(page === 'admin' && !ADMIN_OK) {
     showToast('Admin password required', 'error');
     if(fromHistory) { try { history.replaceState({page: 'home'}, ''); } catch(e) {} goPage('home', true); }
@@ -10465,12 +10846,13 @@ function goPage(page, fromHistory) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   if(page === 'home') document.getElementById('homeBtn').classList.add('active');
   if(page === 'orders') document.getElementById('ordersBtn').classList.add('active');
-  if(page === 'admin') document.getElementById('adminBtn').classList.add('active');
+  if(page === 'admin') document.getElementById('adminBtn')?.classList.add('active');
   if(page === 'cart') document.getElementById('cartBtn').classList.add('active');
 
   if(page === 'home') renderHome();
   if(page === 'cart') renderCart();
   if(page === 'orders') { renderOrders(); loadMyOrders().then(renderOrders); }
+  if(page === 'account') { renderAccount(); loadMyOrders().then(renderAccount); }
   if(page === 'admin') {
     renderAdmin();
     switchAdminTab('dashboard', document.getElementById('adminDashboardButton'));
@@ -10505,6 +10887,8 @@ function renderCheckout() {
   </div></div>`;
 
   document.getElementById('checkoutSummary').innerHTML = summary;
+  acctApplyToCheckout();
+  mtechLoadPaymentConfig().then(mtechApplyPaymentAvailability);
 }
 
 function setPaymentMethod(el) {
@@ -10617,7 +11001,13 @@ async function placeOrder() {
       localStorage.removeItem('mtechCustomerToken'); localStorage.removeItem('mtechCustomerSession');
       renderCustomerAuthArea(); showCustomerAuth('signin', null, true);
     }
-    showToast(e.message || 'Could not place order', 'error');
+    if(/not configured/i.test(e.message || '')) {
+      mtechPaymentConfig = {razorpay: false};
+      mtechApplyPaymentAvailability();
+      showToast('Online payment is not available right now. Please choose Bank Transfer.', 'error');
+    } else {
+      showToast(e.message || 'Could not place order', 'error');
+    }
   } finally { window.mtechOrdering = false; }
 }
 
@@ -10733,7 +11123,7 @@ function renderAdminProducts() {
   const rows = pageItems.map(p => `
     <tr>
       <td>${p.id}</td><td>${p.name}</td><td>${p.category}</td><td>${p.subcategory || '-'}</td>
-      <td>₹${Number(p.price || 0).toLocaleString()}</td><td>${Number(p.stock || 0)}</td>
+      <td>${p.category === 'Software' ? '—' : '₹' + Number(p.price || 0).toLocaleString()}</td><td>${p.category === 'Software' ? ((p.versions || []).length + ' version' + ((p.versions || []).length === 1 ? '' : 's')) : Number(p.stock || 0)}</td>
       <td><button class="action-btn edit" onclick="openEditProductModal(${p.id})">Edit</button> ${p.category === 'Antivirus' ? `<button class="action-btn" style="background:#e6f7f0;color:var(--success);" onclick="openKeysModal(${p.id})">Keys</button>` : ''} <button class="action-btn delete" onclick="deleteProduct(${p.id})">Delete</button></td>
     </tr>`).join('');
   document.getElementById('productsTableBody').innerHTML = rows || '<tr><td colspan="7">No products match</td></tr>';
@@ -10882,6 +11272,7 @@ function renderInventoryStats() {
     if(category !== 'All' && product.category !== category) return false;
     const stockFilter = document.getElementById('inventoryStockFilter')?.value || 'all';
     const stockQty = Number(product.stock || 0);
+    if(product.category === 'Software' && stockFilter !== 'all') return false;
     if(stockFilter === 'low' && !(stockQty > 0 && stockQty <= LOW_STOCK_LIMIT)) return false;
     if(stockFilter === 'out' && stockQty > 0) return false;
     return !search || `${product.id} ${product.name} ${product.category} ${product.subcategory || ''}`.toLowerCase().includes(search);
@@ -10928,13 +11319,94 @@ function switchAdminTab(tab, btn) {
 
 // Download link field: Antivirus and Software products
 function hasDownloadLink(category, subcategory) {
-  return category === 'Antivirus' || category === 'Software';
+  return category === 'Antivirus'; // Software uses the Versions editor instead
 }
 function toggleModalGroups() {
   const cat = document.getElementById('modalCategory').value;
   const sub = document.getElementById('modalSubcategory').value;
   document.getElementById('modalVideoGroup').style.display = cat === 'Antivirus' ? 'block' : 'none';
   document.getElementById('modalDownloadGroup').style.display = hasDownloadLink(cat, sub) ? 'block' : 'none';
+  const soft = cat === 'Software';
+  const hidePS = soft || cat === 'PC Build'; // no Price / Stock fields for these categories
+  document.getElementById('modalPriceGroup').style.display = hidePS ? 'none' : 'block';
+  document.getElementById('modalStockGroup').style.display = hidePS ? 'none' : 'block';
+  document.getElementById('modalVersionsGroup').style.display = soft ? 'block' : 'none';
+  if(soft) { if(!modalVersions.length) modalVersions.push(vzBlankVersion()); renderModalVersions(); }
+}
+
+// ==================== SOFTWARE VERSIONS (admin editor) ====================
+let modalVersions = [];
+const VZ_ARCH = ['x64','x86','ARM64','Any'];
+function vzBlankLink(){ return {label:'', url:''}; }
+function vzBlankRow(){ return {lang:'English', arch:'x64', links:[vzBlankLink()]}; }
+function vzBlankVersion(){ return {name:'', build:'', rows:[vzBlankRow()]}; }
+function vzE(v){ return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function vzFromProduct(p){
+  if(Array.isArray(p.versions) && p.versions.length) return JSON.parse(JSON.stringify(p.versions));
+  if(p.category === 'Software' && p.downloadLink) return [{name: p.name, build:'', rows:[{lang:'English', arch:'Any', links:[{label:'Download', url:p.downloadLink}]}]}];
+  return [];
+}
+function renderModalVersions(){
+  const box = document.getElementById('modalVersionsList'); if(!box) return;
+  box.innerHTML = modalVersions.map((v,vi) => `
+    <div class="vz-ver">
+      <div class="vz-head">
+        <div><label>Version name</label><input class="vz-in" data-vz="name" data-v="${vi}" value="${vzE(v.name)}" placeholder="Windows Vista SP2"></div>
+        <div><label>Build</label><input class="vz-in" data-vz="build" data-v="${vi}" value="${vzE(v.build)}" placeholder="6002.18005"></div>
+        <button type="button" class="vz-btn red" onclick="vzDelVersion(${vi})">Remove version</button>
+      </div>
+      ${v.rows.map((r,ri) => `
+      <div class="vz-row">
+        <div><label>Language</label><input class="vz-in" data-vz="lang" data-v="${vi}" data-r="${ri}" value="${vzE(r.lang)}"></div>
+        <div><label>Arch</label><select class="vz-in" data-vz="arch" data-v="${vi}" data-r="${ri}">${VZ_ARCH.map(a => `<option${a===r.arch?' selected':''}>${a}</option>`).join('')}</select></div>
+        <div><label>Links</label>
+          ${r.links.map((l,li) => `<div class="vz-lk">
+            <input class="vz-in" list="vzLabels" data-vz="label" data-v="${vi}" data-r="${ri}" data-l="${li}" value="${vzE(l.label)}" placeholder="Buzzheavier">
+            <input class="vz-in" data-vz="url" data-v="${vi}" data-r="${ri}" data-l="${li}" value="${vzE(l.url)}" placeholder="https://...">
+            <button type="button" class="vz-btn red" aria-label="Remove link" onclick="vzDelLink(${vi},${ri},${li})">×</button>
+          </div>`).join('')}
+          <button type="button" class="vz-btn" onclick="vzAddLink(${vi},${ri})">+ Add link</button>
+        </div>
+        <button type="button" class="vz-btn red" onclick="vzDelRow(${vi},${ri})">Delete row</button>
+      </div>`).join('')}
+      <button type="button" class="vz-btn" style="margin-top:10px;" onclick="vzAddRow(${vi})">+ Add row (Language / Arch)</button>
+    </div>`).join('');
+}
+document.addEventListener('input', function(e){
+  const t = e.target, k = t && t.dataset && t.dataset.vz; if(!k) return;
+  const v = modalVersions[+t.dataset.v]; if(!v) return;
+  if(k === 'name' || k === 'build') { v[k] = t.value; return; }
+  const r = v.rows[+t.dataset.r]; if(!r) return;
+  if(k === 'lang' || k === 'arch') { r[k] = t.value; return; }
+  const l = r.links[+t.dataset.l]; if(l) l[k] = t.value;
+});
+function vzAddVersion(){ modalVersions.push(vzBlankVersion()); renderModalVersions(); }
+function vzDelVersion(v){ modalVersions.splice(v,1); renderModalVersions(); }
+function vzAddRow(v){ modalVersions[v].rows.push(vzBlankRow()); renderModalVersions(); }
+function vzDelRow(v,r){ modalVersions[v].rows.splice(r,1); renderModalVersions(); }
+function vzAddLink(v,r){ modalVersions[v].rows[r].links.push(vzBlankLink()); renderModalVersions(); }
+function vzDelLink(v,r,l){ modalVersions[v].rows[r].links.splice(l,1); renderModalVersions(); }
+// returns cleaned versions, or null (after showing an error toast)
+function vzClean(){
+  const out = [];
+  for(const v of modalVersions) {
+    const rows = [];
+    for(const r of v.rows) {
+      const links = [];
+      for(const l of r.links) {
+        const url = (l.url || '').trim(); if(!url) continue;
+        if(!/^https?:\/\//i.test(url)) { showToast('Download links must start with http:// or https://', 'error'); return null; }
+        links.push({label: (l.label || '').trim() || 'Download', url});
+      }
+      if(links.length) rows.push({lang: (r.lang || '').trim() || 'English', arch: r.arch || 'Any', links});
+    }
+    const name = (v.name || '').trim();
+    if(!name && !rows.length) continue;
+    if(!name) { showToast('Give every version a name (e.g. Windows Vista SP2)', 'error'); return null; }
+    if(rows.length) out.push({name, build: (v.build || '').trim(), rows});
+    else out.push({name, build: (v.build || '').trim(), rows: []});
+  }
+  return out;
 }
 
 function updateCategoryOptions(selected='') {
@@ -10961,6 +11433,7 @@ function openAddProductModal() {
   document.getElementById('modalDownloadLink').value = '';
   document.getElementById('modalImage').value = ''; window._modalImgData = ''; updateImgPreview('');
   modalPlans = []; renderModalPlans();
+  modalVersions = [];
   updateSubcategoryOptions();
   document.getElementById('productModal').classList.add('active');
 }
@@ -10985,6 +11458,7 @@ function openEditProductModal(id) {
   document.getElementById('modalName').value = product.name;
   updateCategoryOptions(product.category);
   document.getElementById('modalCategory').value = product.category;
+  modalVersions = vzFromProduct(product);
   updateSubcategoryOptions(product.subcategory);
   document.getElementById('modalPrice').value = product.price || 0;
   const stockInput = document.getElementById('modalStock');
@@ -11038,7 +11512,7 @@ function saveProduct() {
   let stock = Number(document.getElementById('modalStock').value || 0);
   const specs = document.getElementById('modalSpecs').value.trim();
   const installVideo = category === 'Antivirus' ? document.getElementById('modalInstallVideo').value.trim() : '';
-  const downloadLink = hasDownloadLink(category, subcategory) ? document.getElementById('modalDownloadLink').value.trim() : '';
+  let downloadLink = hasDownloadLink(category, subcategory) ? document.getElementById('modalDownloadLink').value.trim() : '';
   const image = window._modalImgData || (document.getElementById('modalImage').value || '').trim();
   let plans = [];
   if(category === 'Antivirus') {
@@ -11047,16 +11521,24 @@ function saveProduct() {
     plans.sort((a, b) => a.users - b.users || a.years - b.years);
     if(plans.length) { price = Math.min(...plans.map(x => x.price)); stock = plans.reduce((a, x) => a + x.stock, 0); }
   }
+  let versions = [];
+  if(category === 'Software') {
+    price = 0; stock = 0;
+    const cleaned = vzClean(); if(cleaned === null) return;
+    versions = cleaned;
+    const firstLink = versions.flatMap(v => v.rows).flatMap(r => r.links)[0];
+    downloadLink = firstLink ? firstLink.url : ''; // kept so older code/server that read downloadLink keep working
+  }
   if(!name || !subcategory || price < 0 || stock < 0) { showToast('Please fill Product, Category, Sub Category, Price and Stock correctly', 'error'); return; }
   if(editingProductId) {
     const idx = products.findIndex(p => p.id === editingProductId);
     const keyManaged = Array.isArray(products[idx].licenseKeys);
     if(keyManaged) stock = products[idx].stock; // stock stays derived from keys, ignore manual input
-    products[idx] = {...products[idx], name, category, subcategory, price, stock, specs, installVideo, downloadLink, image, plans};
+    products[idx] = {...products[idx], name, category, subcategory, price, stock, specs, installVideo, downloadLink, image, plans, versions};
     showToast('Product updated!', 'success');
   } else {
     const newId = getNextProductId();
-    products.push({id:newId, name, category, subcategory, price, stock, specs, installVideo, downloadLink, image, plans});
+    products.push({id:newId, name, category, subcategory, price, stock, specs, installVideo, downloadLink, image, plans, versions});
     showToast('Product added!', 'success');
   }
   if(!CATEGORIES.includes(category)) CATEGORIES.push(category);

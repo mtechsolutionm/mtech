@@ -5,6 +5,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const vm = require('node:vm');
+const net = require('node:net');
 
 const ROOT = __dirname;
 const DATA_DIR = process.env.DATA_DIR || path.join(ROOT, 'data');
@@ -14,6 +15,12 @@ const ORDER_FILE = path.join(DATA_DIR, 'order-store.json');
 const HOST = process.env.HOST || '::1';
 const PORT = Number(process.env.PORT || 8000);
 const ADMIN_SESSION_MS = 8 * 60 * 60 * 1000;
+const MIN_ADMIN_PASSWORD_LENGTH = 12;
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const RATE_LIMIT_MAX_KEYS = 20000;
+const RATE_LIMIT_SWEEP_MS = 5 * 60 * 1000;
+const EMAIL_VERIFY_MS = 24 * 60 * 60 * 1000;
+const EMAIL_RESEND_GAP_MS = 10 * 60 * 1000;
 const PAYMENT_INTENT_MS = 30 * 60 * 1000;
 const DELIVERY_FEE = 99;
 const DEFAULT_CATEGORIES = ['Antivirus', 'Software', 'PC Build'];
@@ -26,7 +33,7 @@ const adminSessions = new Map();
 const customerSessions = new Map();
 const rateLimits = new Map();
 let store = { dealers: [], requests: [] };
-let orderStore = { customers: [], orders: [], paymentIntents: [] };
+let orderStore = { customers: [], orders: [], paymentIntents: [], emailVerifications: [] };
 let writeQueue = Promise.resolve();
 let catalogWriteQueue = Promise.resolve();
 let orderWriteQueue = Promise.resolve();
@@ -72,7 +79,8 @@ async function loadOrderStore() {
     orderStore = {
       customers: Array.isArray(saved.customers) ? saved.customers : [],
       orders: Array.isArray(saved.orders) ? saved.orders : [],
-      paymentIntents: Array.isArray(saved.paymentIntents) ? saved.paymentIntents : []
+      paymentIntents: Array.isArray(saved.paymentIntents) ? saved.paymentIntents : [],
+      emailVerifications: Array.isArray(saved.emailVerifications) ? saved.emailVerifications : []
     };
   } catch (error) {
     if (error.code !== 'ENOENT') throw error;
@@ -239,12 +247,14 @@ function saveCatalog() {
     categories: categoryCatalog.categories,
     structure: categoryCatalog.structure
   }, null, 2) + '\n';
-  catalogWriteQueue = catalogWriteQueue.then(async () => {
+  // A failed write must not poison the queue: later saves still run, and the caller of THIS save sees the error.
+  const run = catalogWriteQueue.catch(() => {}).then(async () => {
     const tempFile = CATALOG_FILE + '.tmp';
     await fs.writeFile(tempFile, snapshot, { mode: 0o600 });
     await fs.rename(tempFile, CATALOG_FILE);
   });
-  return catalogWriteQueue;
+  catalogWriteQueue = run.catch(() => {});
+  return run;
 }
 
 function generateDealerCode(existing = new Set()) {
@@ -260,22 +270,24 @@ function generateDealerCode(existing = new Set()) {
 
 function saveStore() {
   const snapshot = JSON.stringify(store, null, 2) + '\n';
-  writeQueue = writeQueue.then(async () => {
+  const run = writeQueue.catch(() => {}).then(async () => {
     const tempFile = STORE_FILE + '.tmp';
     await fs.writeFile(tempFile, snapshot, { mode: 0o600 });
     await fs.rename(tempFile, STORE_FILE);
   });
-  return writeQueue;
+  writeQueue = run.catch(() => {});
+  return run;
 }
 
 function saveOrderStore() {
   const snapshot = JSON.stringify(orderStore, null, 2) + '\n';
-  orderWriteQueue = orderWriteQueue.then(async () => {
+  const run = orderWriteQueue.catch(() => {}).then(async () => {
     const tempFile = ORDER_FILE + '.tmp';
     await fs.writeFile(tempFile, snapshot, { mode: 0o600 });
     await fs.rename(tempFile, ORDER_FILE);
   });
-  return orderWriteQueue;
+  orderWriteQueue = run.catch(() => {});
+  return run;
 }
 
 function serializeOrderMutation(action) {
@@ -572,12 +584,84 @@ function requireAdmin(request) {
   }
 }
 
-function rateLimit(key, limit, windowMs) {
+function normalizeIp(value) {
+  let ip = String(value || '').trim();
+  if (ip.startsWith('::ffff:')) ip = ip.slice(7);
+  return net.isIP(ip) ? ip : '';
+}
+
+// Real visitor IP. Proxy headers (Cloudflare Tunnel, ngrok, nginx on this PC) are trusted
+// ONLY when the connection itself comes from this machine (loopback). A visitor who connects
+// directly from the internet/LAN can never fake their IP with these headers.
+function getClientIp(request) {
+  const remote = normalizeIp(request.socket.remoteAddress) || 'unknown';
+  if (remote !== '127.0.0.1' && remote !== '::1') return remote;
+  const cloudflare = normalizeIp(request.headers['cf-connecting-ip']);
+  if (cloudflare) return cloudflare;
+  const forwarded = String(request.headers['x-forwarded-for'] || '')
+    .split(',')
+    .map(normalizeIp)
+    .filter(Boolean);
+  // The last entry is the one our own proxy added; earlier entries can be faked by the visitor.
+  if (forwarded.length) return forwarded[forwarded.length - 1];
+  return remote;
+}
+
+function sweepRateLimits() {
   const now = Date.now();
-  const recent = (rateLimits.get(key) || []).filter(time => now - time < windowMs);
+  for (const [key, entry] of rateLimits) {
+    if (!entry.times.some(time => now - time < entry.windowMs)) rateLimits.delete(key);
+  }
+  for (const [token, expiresAt] of adminSessions) {
+    if (expiresAt <= now) adminSessions.delete(token);
+  }
+  for (const [token, session] of customerSessions) {
+    if (session.expiresAt <= now) customerSessions.delete(token);
+  }
+}
+
+function getRateEntry(key, windowMs) {
+  const now = Date.now();
+  let entry = rateLimits.get(key);
+  if (!entry) {
+    if (rateLimits.size >= RATE_LIMIT_MAX_KEYS) {
+      sweepRateLimits();
+      if (rateLimits.size >= RATE_LIMIT_MAX_KEYS) {
+        // Still full: drop the oldest 10% so memory can never grow without limit.
+        let drop = Math.ceil(RATE_LIMIT_MAX_KEYS / 10);
+        for (const oldKey of rateLimits.keys()) {
+          rateLimits.delete(oldKey);
+          if (--drop <= 0) break;
+        }
+      }
+    }
+    entry = { times: [], windowMs };
+    rateLimits.set(key, entry);
+  }
+  entry.windowMs = Math.max(entry.windowMs, windowMs);
+  entry.times = entry.times.filter(time => now - time < windowMs);
+  return entry;
+}
+
+// Counts every attempt (used for per-IP limits).
+function rateLimit(key, limit, windowMs) {
+  const entry = getRateEntry(key, windowMs);
+  if (entry.times.length >= limit) fail(429, 'Too many attempts. Please wait before trying again.');
+  entry.times.push(Date.now());
+}
+
+// Only checks, does not count (used before verifying a password).
+function checkRateLimit(key, limit, windowMs) {
+  const entry = rateLimits.get(key);
+  if (!entry) return;
+  const now = Date.now();
+  const recent = entry.times.filter(time => now - time < windowMs);
   if (recent.length >= limit) fail(429, 'Too many attempts. Please wait before trying again.');
-  recent.push(now);
-  rateLimits.set(key, recent);
+}
+
+// Counts one FAILED attempt.
+function recordRateLimitFailure(key, windowMs) {
+  getRateEntry(key, windowMs).times.push(Date.now());
 }
 
 async function sendEmailOtp(email, code, accountType = 'dealer') {
@@ -622,10 +706,112 @@ async function sendSmsOtp(mobile, code, accountType = 'dealer') {
   if (!response.ok) throw new Error('SMS provider rejected the OTP request.');
 }
 
+// ---- Security headers (#6) -------------------------------------------------------------
+function isSecureRequest(request) {
+  const remote = normalizeIp(request.socket.remoteAddress);
+  if (remote !== '127.0.0.1' && remote !== '::1') return Boolean(request.socket.encrypted);
+  // Request came through a proxy/tunnel on this PC (Cloudflare Tunnel, ngrok, nginx): trust its scheme.
+  const proto = String(request.headers['x-forwarded-proto'] || '').split(',')[0].trim().toLowerCase();
+  if (proto === 'https') return true;
+  return /"scheme"\s*:\s*"https"/.test(String(request.headers['cf-visitor'] || ''));
+}
+
+function applySecurityHeaders(request, response) {
+  response.setHeader('X-Content-Type-Options', 'nosniff');
+  response.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  response.setHeader('Referrer-Policy', 'same-origin');
+  response.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), usb=()');
+  // HSTS is only sent when the visitor really is on HTTPS (browsers ignore it on plain HTTP anyway).
+  if (isSecureRequest(request)) response.setHeader('Strict-Transport-Security', 'max-age=31536000');
+}
+
+// ---- Public catalog must never contain license keys (#1) -------------------------------
+function publicProducts() {
+  return productCatalog.map(product => {
+    if (!product || typeof product !== 'object' || !('licenseKeys' in product)) return product;
+    const { licenseKeys, ...rest } = product;
+    return rest;
+  });
+}
+
+async function backupFileOncePerDay(file) {
+  const target = `${file}.${new Date().toISOString().slice(0, 10)}.bak`;
+  try {
+    await fs.copyFile(file, target, require('node:fs').constants.COPYFILE_EXCL);
+  } catch (error) {
+    if (error.code !== 'EEXIST' && error.code !== 'ENOENT') console.error('Backup failed:', error.message);
+  }
+}
+
+// ---- Customer email verification (#5) --------------------------------------------------
+function publicBaseUrl() {
+  return String(process.env.PUBLIC_URL || '').trim().replace(/\/+$/, '');
+}
+
+// Turned on only when a mail provider AND the public site address are configured in .env.
+function emailVerificationEnabled() {
+  return Boolean(process.env.RESEND_API_KEY && process.env.RESEND_FROM_EMAIL && /^https?:\/\//i.test(publicBaseUrl()));
+}
+
+async function sendCustomerVerificationEmail(email, name, link) {
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: process.env.RESEND_FROM_EMAIL,
+      to: [email],
+      subject: 'Verify your email for Mtech',
+      text: `Hello ${name || 'customer'},\n\nPlease confirm this email address to place orders on Mtech:\n${link}\n\nThis link works for 24 hours. If you did not create an account, you can ignore this email.`
+    })
+  });
+  if (!response.ok) throw new Error('Email provider rejected the verification email.');
+}
+
+// Call inside serializeOrderMutation (it changes and saves orderStore).
+async function issueEmailVerification(customer) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+  const now = Date.now();
+  orderStore.emailVerifications = (orderStore.emailVerifications || [])
+    .filter(item => item.expiresAt > now && item.email !== customer.email);
+  orderStore.emailVerifications.push({ tokenHash, email: customer.email, sentAt: now, expiresAt: now + EMAIL_VERIFY_MS });
+  await saveOrderStore();
+  const link = `${publicBaseUrl()}/api/customers/verify-email?token=${token}`;
+  sendCustomerVerificationEmail(customer.email, customer.name, link)
+    .catch(error => console.error('Could not send verification email:', error.message));
+}
+
+function requireVerifiedCustomer(request) {
+  const customer = requireCustomer(request);
+  if (emailVerificationEnabled() && customer.emailVerified === false) {
+    serializeOrderMutation(async () => {
+      const last = (orderStore.emailVerifications || []).find(item => item.email === customer.email);
+      if (!last || Date.now() - last.sentAt > EMAIL_RESEND_GAP_MS) await issueEmailVerification(customer);
+    }).catch(error => console.error('Could not re-issue verification email:', error.message));
+    fail(403, 'Please verify your email address before ordering. We have emailed you a verification link. Open it, then try again.');
+  }
+  return customer;
+}
+
+function sendHtml(response, status, message) {
+  const body = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Mtech</title></head><body style="font-family:Arial,sans-serif;max-width:480px;margin:15vh auto;padding:0 20px;text-align:center"><h2>${message}</h2><p><a href="/">Go to the store</a></p></body></html>`;
+  response.writeHead(status, {
+    'Content-Type': 'text/html; charset=utf-8',
+    'Cache-Control': 'no-store',
+    'Referrer-Policy': 'no-referrer',
+    'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'"
+  });
+  response.end(body);
+}
+
 async function route(request, response) {
   const url = new URL(request.url, `http://${request.headers.host || 'localhost'}`);
   const { pathname } = url;
-  const ip = request.socket.remoteAddress || 'unknown';
+  const ip = getClientIp(request);
+  applySecurityHeaders(request, response);
 
   if (request.method === 'GET' && pathname === '/api/health') {
     return sendJson(response, 200, { success: true });
@@ -659,15 +845,39 @@ async function route(request, response) {
       const passwordHash = await new Promise((resolve, reject) => {
         crypto.scrypt(password, salt, 64, (error, derivedKey) => error ? reject(error) : resolve(derivedKey.toString('hex')));
       });
+      const needsVerification = emailVerificationEnabled();
       const customer = { id: crypto.randomUUID(), name, email, salt, passwordHash, createdAt: new Date().toISOString() };
+      if (needsVerification) customer.emailVerified = false;
       orderStore.customers.push(customer);
-      await saveOrderStore();
+      if (needsVerification) await issueEmailVerification(customer);
+      else await saveOrderStore();
       return sendJson(response, 201, {
         success: true,
+        emailVerificationRequired: needsVerification,
         token: createCustomerSession(customer),
         name: customer.name,
         email: customer.email
       });
+    });
+  }
+
+  if (request.method === 'GET' && pathname === '/api/customers/verify-email') {
+    rateLimit(`verify-email:${ip}`, 30, 15 * 60 * 1000);
+    const token = String(url.searchParams.get('token') || '');
+    if (!/^[a-f\d]{64}$/i.test(token)) {
+      return sendHtml(response, 400, 'This verification link is not valid.');
+    }
+    const tokenHash = crypto.createHash('sha256').update(token.toLowerCase()).digest('hex');
+    return serializeOrderMutation(async () => {
+      const entry = (orderStore.emailVerifications || []).find(item => item.tokenHash === tokenHash && item.expiresAt > Date.now());
+      const customer = entry && orderStore.customers.find(item => item.email === entry.email);
+      if (!entry || !customer) {
+        return sendHtml(response, 400, 'This verification link is invalid or has expired. Sign in and try to place an order to get a new link.');
+      }
+      customer.emailVerified = true;
+      orderStore.emailVerifications = orderStore.emailVerifications.filter(item => item !== entry);
+      await saveOrderStore();
+      return sendHtml(response, 200, 'Your email is verified. You can now place orders.');
     });
   }
 
@@ -679,7 +889,12 @@ async function route(request, response) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length > 256) {
       fail(401, 'Email or password is incorrect.');
     }
-    rateLimit(`customer-login-email:${email}`, 10, 15 * 60 * 1000);
+    // Failed attempts are counted per (email + IP), so a stranger cannot lock the real owner out.
+    // A higher all-IPs limit per email still stops password guessing from many IPs.
+    const loginKey = `customer-login-fail:${email}:${ip}`;
+    const loginEmailKey = `customer-login-fail-email:${email}`;
+    checkRateLimit(loginKey, 10, LOGIN_WINDOW_MS);
+    checkRateLimit(loginEmailKey, 50, LOGIN_WINDOW_MS);
     const customer = orderStore.customers.find(item => item.email === email);
     const suppliedHash = await new Promise((resolve, reject) => {
       crypto.scrypt(password, customer?.salt || 'invalid-customer-salt', 64, (error, derivedKey) =>
@@ -688,8 +903,11 @@ async function route(request, response) {
     });
     const savedHash = Buffer.from(customer?.passwordHash || '0'.repeat(128), 'hex');
     if (!customer || savedHash.length !== suppliedHash.length || !crypto.timingSafeEqual(suppliedHash, savedHash)) {
+      recordRateLimitFailure(loginKey, LOGIN_WINDOW_MS);
+      recordRateLimitFailure(loginEmailKey, LOGIN_WINDOW_MS);
       fail(401, 'Email or password is incorrect.');
     }
+    rateLimits.delete(loginKey);
     return sendJson(response, 200, {
       success: true,
       token: createCustomerSession(customer),
@@ -699,7 +917,7 @@ async function route(request, response) {
   }
 
   if (request.method === 'POST' && pathname === '/api/payments/razorpay/orders') {
-    const customer = requireCustomer(request);
+    const customer = requireVerifiedCustomer(request);
     rateLimit(`razorpay-order:${ip}`, 10, 15 * 60 * 1000);
     const body = await readJson(request, 64 * 1024);
     const address = validateOrderAddress(body.customer);
@@ -837,7 +1055,7 @@ async function route(request, response) {
   }
 
   if (request.method === 'POST' && pathname === '/api/orders') {
-    const customer = requireCustomer(request);
+    const customer = requireVerifiedCustomer(request);
     const body = await readJson(request, 64 * 1024);
     const address = validateOrderAddress(body.customer);
     const paymentMethod = String(body.paymentMethod || '');
@@ -859,6 +1077,10 @@ async function route(request, response) {
       await saveOrderStore();
       return sendJson(response, 201, { success: true, order });
     });
+  }
+
+  if (request.method === 'GET' && pathname === '/api/payments/config') {
+    return sendJson(response, 200, { razorpay: Boolean(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) });
   }
 
   if (request.method === 'GET' && pathname === '/api/auth/google-config') {
@@ -892,13 +1114,28 @@ async function route(request, response) {
       let customer = orderStore.customers.find(item => item.email === email);
       let created = false;
       if (!customer) {
-        customer = { id: crypto.randomUUID(), name: displayName, email, salt: '', passwordHash: '', googleId: String(info.sub || ''), createdAt: new Date().toISOString() };
+        customer = { id: crypto.randomUUID(), name: displayName, email, salt: '', passwordHash: '', googleId: String(info.sub || ''), emailVerified: true, createdAt: new Date().toISOString() };
         orderStore.customers.push(customer);
         created = true;
         await saveOrderStore();
-      } else if (!customer.googleId && info.sub) {
-        customer.googleId = String(info.sub);
-        await saveOrderStore();
+      } else {
+        let changed = false;
+        if (!customer.googleId && info.sub) {
+          customer.googleId = String(info.sub);
+          changed = true;
+        }
+        if (customer.emailVerified === false) {
+          // Google has proven who owns this email, so drop the password chosen by whoever registered it first.
+          customer.salt = '';
+          customer.passwordHash = '';
+          customer.emailVerified = true;
+          for (const [sessionToken, session] of customerSessions) {
+            if (session.email === customer.email) customerSessions.delete(sessionToken);
+          }
+          orderStore.emailVerifications = (orderStore.emailVerifications || []).filter(item => item.email !== customer.email);
+          changed = true;
+        }
+        if (changed) await saveOrderStore();
       }
       return sendJson(response, created ? 201 : 200, {
         success: true,
@@ -942,13 +1179,19 @@ async function route(request, response) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^MT-[A-Z2-9]{6}$/.test(code)) {
       fail(400, 'Enter your dealer email address and valid dealer code.');
     }
-    rateLimit(`dealer-code-email:${email}`, 10, 15 * 60 * 1000);
+    const dealerKey = `dealer-code-fail:${email}:${ip}`;
+    const dealerEmailKey = `dealer-code-fail-email:${email}`;
+    checkRateLimit(dealerKey, 10, LOGIN_WINDOW_MS);
+    checkRateLimit(dealerEmailKey, 50, LOGIN_WINDOW_MS);
     const dealer = store.dealers.find(item => item.email === email);
     const suppliedHash = crypto.createHash('sha256').update(code).digest();
     const savedHash = crypto.createHash('sha256').update(String(dealer?.code || '')).digest();
     if (!dealer || !crypto.timingSafeEqual(suppliedHash, savedHash)) {
+      recordRateLimitFailure(dealerKey, LOGIN_WINDOW_MS);
+      recordRateLimitFailure(dealerEmailKey, LOGIN_WINDOW_MS);
       fail(401, 'Dealer email or code is incorrect.');
     }
+    rateLimits.delete(dealerKey);
     return sendJson(response, 200, {
       success: true,
       dealer: { name: dealer.name, email: dealer.email, mobile: dealer.mobile }
@@ -956,7 +1199,7 @@ async function route(request, response) {
   }
 
   if (request.method === 'GET' && pathname === '/api/products') {
-    return sendJson(response, 200, productCatalog);
+    return sendJson(response, 200, publicProducts());
   }
 
   if (request.method === 'GET' && pathname === '/api/admin/products') {
@@ -987,6 +1230,7 @@ async function route(request, response) {
       if (ids.has(id)) fail(400, `Duplicate product ID: ${id}.`);
       ids.add(id);
     }
+    await backupFileOncePerDay(CATALOG_FILE);
     productCatalog = body;
     syncCategoriesFromProducts();
     await saveCatalog();
@@ -1143,8 +1387,8 @@ async function route(request, response) {
 }
 
 async function start() {
-  if (!process.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD.length < 5) {
-    throw new Error('Set ADMIN_PASSWORD to a unique value of at least 5 characters in .env.');
+  if (!process.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD.length < MIN_ADMIN_PASSWORD_LENGTH) {
+    throw new Error(`Set ADMIN_PASSWORD to a unique value of at least ${MIN_ADMIN_PASSWORD_LENGTH} characters in .env.`);
   }
   await loadStore();
   await loadProductCatalog();
@@ -1162,6 +1406,7 @@ async function start() {
       if (!error.status) console.error(error);
     });
   });
+  setInterval(sweepRateLimits, RATE_LIMIT_SWEEP_MS).unref();
   server.listen(PORT, HOST, () => {
     console.log(`Mtech store running at http://${HOST}:${PORT}`);
     console.log(`Dealer data is stored locally in ${STORE_FILE}`);
